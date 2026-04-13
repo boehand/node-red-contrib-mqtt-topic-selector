@@ -1,0 +1,22 @@
+{
+  "name": "node-red-contrib-mqtt-topic-selector",
+  "version": "1.0.0",
+  "description": "A Node-RED node for selecting topics from an MQTT broker via live-listening.",
+  "author": "Andreas Böhm",
+  "organization": "STFI, Chemnitz (Germany)",
+  "license": "Apache-2.0",
+  "keywords": [
+    "node-red",
+    "mqtt",
+    "topic",
+    "selector"
+  ],
+  "node-red": {
+    "nodes": {
+      "node-mqtt-topic-selector": "node-mqtt-topic-selector.js"
+    }
+  },
+  "dependencies": {
+    "mqtt": "^5.0.0"
+  }
+}

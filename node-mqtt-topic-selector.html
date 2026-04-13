@@ -1,0 +1,488 @@
+<script type="text/javascript">
+    function generateNodeLabel() {
+        if (this.name) return this.name;
+        var raw = this.topic;
+        if (!raw) return this.type === 'mqtt-topic-selector-in' ? "mqtt-topic-selector-in" : "mqtt-topic-selector-out";
+        
+        var isComfort = (this.comfortMode === "true" || this.comfortMode === true);
+        if (isComfort && this.fetchedLookup) {
+            var lookup = {};
+            try { lookup = JSON.parse(this.fetchedLookup); } catch(e) {}
+            var lbl = raw;
+            Object.keys(lookup).forEach(function(id) {
+                if (lbl.includes(id)) lbl = lbl.split(id).join(lookup[id]); 
+            });
+            // Die fehlerhafte slash-Ersetzung wurde hier entfernt
+            return lbl; 
+        }
+        return raw;
+    }
+
+    function setupTopicBrowser(buttonId, brokerInputId, realTopicId, visualTopicId, comfortId, topicsStorageId, lookupStorageId, labelTopicId, configDivId, toggleBtnId) {
+        
+        function getLabeledTopic(raw, lookup, isComfort) {
+            if (!isComfort || !lookup || !raw) return raw;
+            let label = raw;
+            Object.keys(lookup).forEach(id => {
+                if (label.includes(id)) {
+                    label = label.split(id).join(lookup[id]); 
+                }
+            });
+            // Die fehlerhafte slash-Ersetzung wurde hier entfernt
+            return label;
+        }
+
+        let savedTopics = [];
+        let savedLookup = {};
+
+        try {
+            savedTopics = JSON.parse($(topicsStorageId).val() || "[]");
+            savedLookup = JSON.parse($(lookupStorageId).val() || "{}");
+        } catch(e) {}
+
+        function applyComfortMode() {
+            let isComfort = ($(comfortId).val() === "true");
+            let currentRaw = $(realTopicId).val();
+            
+            if (isComfort) {
+                $(toggleBtnId).parent().show();
+                $(labelTopicId).html('<i class="fa fa-tasks"></i> labeled Topic');
+                $(visualTopicId).val(getLabeledTopic(currentRaw, savedLookup, true));
+            } else {
+                $(toggleBtnId).parent().hide();
+                $(configDivId).hide();
+                $(toggleBtnId).find("i").removeClass("fa-caret-up").addClass("fa-caret-down");
+                
+                $(labelTopicId).html('<i class="fa fa-tasks"></i> Topic');
+                $(visualTopicId).val(currentRaw);
+            }
+            
+            // NEU: Striktes Deduplizieren der Liste, damit nichts mehr doppelt auftaucht!
+            let acData = [];
+            let seenLabels = new Set();
+            
+            savedTopics.forEach(function(t) {
+                let lbl = getLabeledTopic(t, savedLookup, isComfort);
+                if (!seenLabels.has(lbl)) {
+                    seenLabels.add(lbl);
+                    acData.push({ label: lbl, value: t });
+                }
+            });
+            
+            $(visualTopicId).autocomplete("option", "source", acData);
+        }
+
+        // --- UI Events ---
+        $(toggleBtnId).click(function(e) {
+            e.preventDefault();
+            var icon = $(this).find("i");
+            if (icon.hasClass("fa-caret-down")) {
+                icon.removeClass("fa-caret-down").addClass("fa-caret-up");
+                $(configDivId).slideDown();
+            } else {
+                icon.removeClass("fa-caret-up").addClass("fa-caret-down");
+                $(configDivId).slideUp();
+            }
+        });
+
+        function updatePatternVisibility() {
+            var val = $(configDivId).find('.pattern-select').val();
+            $(configDivId).find('.exact-row, .minmax-row, .custom-regex-row').hide();
+            
+            if (val === "exact") $(configDivId).find('.exact-row').show();
+            else if (val === "minmax") $(configDivId).find('.minmax-row').show();
+            else if (val === "custom") $(configDivId).find('.custom-regex-row').show();
+        }
+        $(configDivId).find('.pattern-select').change(updatePatternVisibility);
+        updatePatternVisibility(); 
+
+        // --- Autocomplete ---
+        $(visualTopicId).autocomplete({
+            minLength: 0,
+            source: [], 
+            select: function(event, ui) {
+                $(realTopicId).val(ui.item.value); 
+                $(visualTopicId).val(ui.item.label);
+                return false; 
+            },
+            focus: function(event, ui) {
+                $(visualTopicId).val(ui.item.label);
+                return false;
+            }
+        });
+
+        $(visualTopicId).click(function() { $(this).autocomplete("search", ""); });
+
+        $(visualTopicId).on('blur', function() {
+            if ($(comfortId).val() === "true") {
+                let currentRaw = $(realTopicId).val();
+                $(this).val(getLabeledTopic(currentRaw, savedLookup, true));
+            }
+        });
+
+        $(visualTopicId).on('input', function() {
+            if ($(comfortId).val() !== "true") {
+                $(realTopicId).val($(this).val());
+            }
+        });
+
+        applyComfortMode();
+        $(comfortId).change(function() { applyComfortMode(); });
+
+        // --- AJAX Request ---
+        $(buttonId).click(function() {
+            var brokerId = $(brokerInputId).val();
+            if(!brokerId || brokerId === "_ADD_") {
+                RED.notify("Bitte Broker wählen und deployen.", "warning");
+                return;
+            }
+            var btn = $(this);
+            var originalText = btn.html();
+            btn.html('<i class="fa fa-spinner fa-spin"></i> Listen...');
+            btn.prop('disabled', true);
+
+            var reqData = { 
+                broker: brokerId,
+                idPattern: $(configDivId).find('.pattern-select').val(),
+                idLengthExact: $(configDivId).find('.id-length-exact').val(),
+                idLengthMin: $(configDivId).find('.id-length-min').val(),
+                idLengthMax: $(configDivId).find('.id-length-max').val(),
+                idRegex: $(configDivId).find('.custom-regex-input').val(),
+                nameSuffix: $(configDivId).find('.name-suffix-input').val(),
+                nameKeys: $(configDivId).find('.name-keys-input').val()
+            };
+
+            $.ajax({
+                url: '/mqtt-browse',
+                type: 'GET',
+                data: reqData, 
+                success: function(data) {
+                    btn.html(originalText);
+                    btn.prop('disabled', false);
+
+                    if(data.topics && data.topics.length > 0) {
+                        savedTopics = data.topics;
+                        savedLookup = data.lookup || {};
+
+                        $(topicsStorageId).val(JSON.stringify(savedTopics));
+                        $(lookupStorageId).val(JSON.stringify(savedLookup));
+
+                        applyComfortMode();
+                        $(visualTopicId).autocomplete("search", "");
+
+                        RED.notify(data.topics.length + " Topics empfangen.", "success");
+                    } else {
+                        RED.notify("Keine Topics gefunden.", "info");
+                    }
+                },
+                error: function() {
+                    btn.html(originalText);
+                    btn.prop('disabled', false);
+                    RED.notify("Fehler beim Browsen.", "error");
+                }
+            });
+        });
+    }
+
+    // --- INPUT NODE REGISTRIERUNG ---
+    RED.nodes.registerType('mqtt-topic-selector-in',{
+        category: 'network',
+        defaults: {
+            name: {value:""},
+            topic: {value:"", required:true}, 
+            qos: {value: "0"},
+            broker: {type:"mqtt-broker", required:true},
+            comfortMode: {value: "true"}, 
+            idPattern: {value: "exact"},
+            idLengthExact: {value: 32},
+            idLengthMin: {value: 10},
+            idLengthMax: {value: 40},
+            idRegex: {value: "^[a-zA-Z0-9\\-_]{32}$"},
+            nameSuffix: {value: "/announce"},
+            nameKeys: {value: "name,title,deviceName"},
+            fetchedTopics: {value: "[]"},
+            fetchedLookup: {value: "{}"}
+        },
+        color:"#d8bfd8",
+        inputs:0,
+        outputs:1,
+        icon: "bridge.svg",
+        label: generateNodeLabel,
+        labelStyle: function() { return this.name ? "node_label_italic" : ""; },
+        oneditprepare: function() {
+            if (!this.idPattern) $("#node-input-idPattern").val("exact");
+            if (!this.idLengthExact) $("#node-input-idLengthExact").val(32);
+            if (!this.idLengthMin) $("#node-input-idLengthMin").val(10);
+            if (!this.idLengthMax) $("#node-input-idLengthMax").val(40);
+            if (!this.nameSuffix) $("#node-input-nameSuffix").val("/announce");
+            if (!this.nameKeys) $("#node-input-nameKeys").val("name,title,deviceName");
+
+            setupTopicBrowser('#node-browse-button-in', '#node-input-broker', '#node-input-topic', '#node-input-topicVisual', '#node-input-comfortMode', '#node-input-fetchedTopics', '#node-input-fetchedLookup', '#label-topic-in', '#comfort-settings-in', '#advanced-toggle-in');
+        }
+    });
+
+    // --- OUTPUT NODE REGISTRIERUNG ---
+    RED.nodes.registerType('mqtt-topic-selector-out',{
+        category: 'network',
+        defaults: {
+            name: {value:""},
+            topic: {value:""}, 
+            qos: {value: "0"},
+            retain: {value: "false"},
+            broker: {type:"mqtt-broker", required:true},
+            comfortMode: {value: "true"},
+            idPattern: {value: "exact"},
+            idLengthExact: {value: 32},
+            idLengthMin: {value: 10},
+            idLengthMax: {value: 40},
+            idRegex: {value: "^[a-zA-Z0-9\\-_]{32}$"},
+            nameSuffix: {value: "/announce"},
+            nameKeys: {value: "name,title,deviceName"},
+            fetchedTopics: {value: "[]"},
+            fetchedLookup: {value: "{}"}
+        },
+        color:"#d8bfd8",
+        inputs:1,
+        outputs:0,
+        icon: "bridge.svg",
+        align: "right",
+        label: generateNodeLabel,
+        labelStyle: function() { return this.name ? "node_label_italic" : ""; },
+        oneditprepare: function() {
+            if (!this.idPattern) $("#node-input-idPattern").val("exact");
+            if (!this.idLengthExact) $("#node-input-idLengthExact").val(32);
+            if (!this.idLengthMin) $("#node-input-idLengthMin").val(10);
+            if (!this.idLengthMax) $("#node-input-idLengthMax").val(40);
+            if (!this.nameSuffix) $("#node-input-nameSuffix").val("/announce");
+            if (!this.nameKeys) $("#node-input-nameKeys").val("name,title,deviceName");
+
+            setupTopicBrowser('#node-browse-button-out', '#node-input-broker', '#node-input-topic', '#node-input-topicVisual', '#node-input-comfortModeOut', '#node-input-fetchedTopics', '#node-input-fetchedLookup', '#label-topic-out', '#comfort-settings-out', '#advanced-toggle-out');
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="mqtt-topic-selector-in">
+    <input type="hidden" id="node-input-fetchedTopics">
+    <input type="hidden" id="node-input-fetchedLookup">
+    <input type="hidden" id="node-input-topic">
+
+    <div class="form-row">
+        <label for="node-input-broker"><i class="fa fa-globe"></i> Broker</label>
+        <input type="text" id="node-input-broker">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-comfortMode">
+            <i class="fa fa-magic"></i> Komfort
+            <i class="fa fa-info-circle" title="Baut im Hintergrund ein 'Wörterbuch' aus den empfangenen Info-Topics auf. Kryptische IDs werden damit in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
+        </label>
+        <select id="node-input-comfortMode" style="width:125px">
+            <option value="false">Aus</option>
+            <option value="true">An</option>
+        </select>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 5px;">
+        <label></label>
+        <a href="#" id="advanced-toggle-in" style="text-decoration: none; color: #555; font-size: 0.9em;">
+            <i class="fa fa-caret-down"></i> Erweiterte Komfort-Einstellungen
+        </a>
+    </div>
+
+    <div id="comfort-settings-in" style="display: none; margin-left: 20px; padding-left: 10px; border-left: 2px solid #ccc; margin-bottom: 15px; background: #f9f9f9; padding-top: 10px; padding-bottom: 5px;">
+        
+        <div class="form-row">
+            <label for="node-input-idPattern" style="width: 120px;">
+                <i class="fa fa-cogs"></i> Erkennung
+                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie später durch lesbare Namen ersetzen zu können."></i>
+            </label>
+            <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
+                <option value="exact">Exakte Länge</option>
+                <option value="minmax">Min/Max Länge</option>
+                <option value="custom">Regex (Profi)</option>
+            </select>
+        </div>
+
+        <div class="form-row exact-row" style="display: none;">
+            <label style="width: 120px;">
+                <i class="fa fa-arrows-h"></i> Zeichen
+                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen bei typischen Geräte-IDs)."></i>
+            </label>
+            <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
+        </div>
+
+        <div class="form-row minmax-row" style="display: none;">
+            <label style="width: 120px;">
+                <i class="fa fa-arrows-h"></i> Länge
+                <i class="fa fa-info-circle" title="Die minimale und maximale Zeichenlänge der gesuchten IDs."></i>
+            </label>
+            Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
+            Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
+        </div>
+        
+        <div class="form-row custom-regex-row" style="display: none;">
+            <label for="node-input-idRegex" style="width: 120px;">
+                <i class="fa fa-code"></i> Regex
+                <i class="fa fa-info-circle" title="Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen."></i>
+            </label>
+            <input type="text" id="node-input-idRegex" class="custom-regex-input" style="width: 250px;">
+        </div>
+
+        <div class="form-row">
+            <label for="node-input-nameSuffix" style="width: 120px;">
+                <i class="fa fa-filter"></i> Info-Topic
+                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um nachzuschauen, welche ID zu welchem Gerät oder Namen gehört."></i>
+            </label>
+            <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
+        </div>
+
+        <div class="form-row" style="margin-bottom: 5px;">
+            <label for="node-input-nameKeys" style="width: 120px;">
+                <i class="fa fa-key"></i> JSON Keys 
+                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Dieser Name wird dann anstelle der ID angezeigt. Mehrere Felder mit Komma trennen."></i>
+            </label>
+            <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
+        </div>
+    </div>
+
+    <div class="form-row" style="display: flex; align-items: center;">
+        <label id="label-topic-in" for="node-input-topicVisual" style="width: 105px; min-width: 105px; margin-bottom: 0;">
+            <i class="fa fa-tasks"></i> Topic
+        </label>
+        <div style="display: flex; align-items: center; flex-grow: 1;">
+            <div style="position: relative; flex-grow: 1;">
+                <input type="text" id="node-input-topicVisual" style="width: 100%; padding-right: 24px;" placeholder="Topic auswählen oder eingeben">
+                <i class="fa fa-caret-down" style="position: absolute; right: 8px; top: 10px; color: #777; pointer-events: none;"></i>
+            </div>
+            <a id="node-browse-button-in" class="red-ui-button" style="margin-left: 10px; white-space: nowrap;"><i class="fa fa-search"></i> Listen</a>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-qos"><i class="fa fa-empire"></i> QoS</label>
+        <select id="node-input-qos" style="width:125px"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mqtt-topic-selector-in">
+    <p>Verbindungsherstellung zu einem MQTT-Broker und Abonnement von Topic-Nachrichten.</p>
+</script>
+
+<script type="text/html" data-template-name="mqtt-topic-selector-out">
+    <input type="hidden" id="node-input-fetchedTopics">
+    <input type="hidden" id="node-input-fetchedLookup">
+    <input type="hidden" id="node-input-topic">
+
+    <div class="form-row">
+        <label for="node-input-broker"><i class="fa fa-globe"></i> Broker</label>
+        <input type="text" id="node-input-broker">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-comfortModeOut">
+            <i class="fa fa-magic"></i> Komfort
+            <i class="fa fa-info-circle" title="Baut im Hintergrund ein 'Wörterbuch' aus den empfangenen Info-Topics auf. Kryptische IDs werden damit in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
+        </label>
+        <select id="node-input-comfortModeOut" style="width:125px">
+            <option value="false">Aus</option>
+            <option value="true">An</option>
+        </select>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 5px;">
+        <label></label>
+        <a href="#" id="advanced-toggle-out" style="text-decoration: none; color: #555; font-size: 0.9em;">
+            <i class="fa fa-caret-down"></i> Erweiterte Komfort-Einstellungen
+        </a>
+    </div>
+
+    <div id="comfort-settings-out" style="display: none; margin-left: 20px; padding-left: 10px; border-left: 2px solid #ccc; margin-bottom: 15px; background: #f9f9f9; padding-top: 10px; padding-bottom: 5px;">
+        
+        <div class="form-row">
+            <label for="node-input-idPattern" style="width: 120px;">
+                <i class="fa fa-cogs"></i> Erkennung
+                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie später durch lesbare Namen ersetzen zu können."></i>
+            </label>
+            <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
+                <option value="exact">Exakte Länge</option>
+                <option value="minmax">Min/Max Länge</option>
+                <option value="custom">Regex (Profi)</option>
+            </select>
+        </div>
+
+        <div class="form-row exact-row" style="display: none;">
+            <label style="width: 120px;">
+                <i class="fa fa-arrows-h"></i> Zeichen
+                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen bei typischen Geräte-IDs)."></i>
+            </label>
+            <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
+        </div>
+
+        <div class="form-row minmax-row" style="display: none;">
+            <label style="width: 120px;">
+                <i class="fa fa-arrows-h"></i> Länge
+                <i class="fa fa-info-circle" title="Die minimale und maximale Zeichenlänge der gesuchten IDs."></i>
+            </label>
+            Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
+            Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
+        </div>
+        
+        <div class="form-row custom-regex-row" style="display: none;">
+            <label for="node-input-idRegex" style="width: 120px;">
+                <i class="fa fa-code"></i> Regex
+                <i class="fa fa-info-circle" title="Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen."></i>
+            </label>
+            <input type="text" id="node-input-idRegex" class="custom-regex-input" style="width: 250px;">
+        </div>
+
+        <div class="form-row">
+            <label for="node-input-nameSuffix" style="width: 120px;">
+                <i class="fa fa-filter"></i> Info-Topic
+                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um nachzuschauen, welche ID zu welchem Gerät oder Namen gehört."></i>
+            </label>
+            <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
+        </div>
+
+        <div class="form-row" style="margin-bottom: 5px;">
+            <label for="node-input-nameKeys" style="width: 120px;">
+                <i class="fa fa-key"></i> JSON Keys 
+                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Dieser Name wird dann anstelle der ID angezeigt. Mehrere Felder mit Komma trennen."></i>
+            </label>
+            <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
+        </div>
+    </div>
+
+    <div class="form-row" style="display: flex; align-items: center;">
+        <label id="label-topic-out" for="node-input-topicVisual" style="width: 105px; min-width: 105px; margin-bottom: 0;">
+            <i class="fa fa-tasks"></i> Topic
+        </label>
+        <div style="display: flex; align-items: center; flex-grow: 1;">
+            <div style="position: relative; flex-grow: 1;">
+                <input type="text" id="node-input-topicVisual" style="width: 100%; padding-right: 24px;" placeholder="Topic auswählen (optional)">
+                <i class="fa fa-caret-down" style="position: absolute; right: 8px; top: 10px; color: #777; pointer-events: none;"></i>
+            </div>
+            <a id="node-browse-button-out" class="red-ui-button" style="margin-left: 10px; white-space: nowrap;"><i class="fa fa-search"></i> Listen</a>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-qos"><i class="fa fa-empire"></i> QoS</label>
+        <select id="node-input-qos" style="width:125px"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-retain"><i class="fa fa-history"></i> Retain</label>
+        <select id="node-input-retain" style="width:125px"><option value="false">false</option><option value="true">true</option></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="mqtt-topic-selector-out">
+    <p>Verbindungsherstellung zu einem MQTT-Broker und publizieren von Topic-Nachrichten.</p>
+</script>
