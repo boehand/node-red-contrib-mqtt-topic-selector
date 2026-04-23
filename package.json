@@ -4,12 +4,25 @@
   "description": "A Node-RED node for selecting topics from an MQTT broker via live-listening.",
   "author": "Andreas Böhm",
   "organization": "STFI, Chemnitz (Germany)",
+    "repository": {
+    "type": "git",
+    "url": "https://github.com/boehand/test.git"
+  },
   "license": "Apache-2.0",
   "keywords": [
     "node-red",
     "mqtt",
     "topic",
     "selector"
+  ],
+  "files": [
+    "nodes/",
+    "lib/",
+    "scripts/",
+    "examples/",
+    "test/",
+    "docs/",
+    "README.md"
   ],
   "node-red": {
     "nodes": {
@@ -18,5 +31,8 @@
   },
   "dependencies": {
     "mqtt": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
