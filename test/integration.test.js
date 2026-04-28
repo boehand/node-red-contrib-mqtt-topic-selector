@@ -40,7 +40,7 @@ describe('Integration Tests', () => {
                         break;
                     }
                 }
-            } catch (e) {
+            } catch (_e) {
                 // JSON Parse Fehler
             }
 
@@ -80,7 +80,7 @@ describe('Integration Tests', () => {
                                     break;
                                 }
                             }
-                        } catch (e) {
+                        } catch (_e) {
                             // Ignore
                         }
                     }

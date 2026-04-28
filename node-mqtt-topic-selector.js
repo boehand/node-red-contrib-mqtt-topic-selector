@@ -29,7 +29,7 @@ module.exports = function(RED) {
         let idRegex;
         try {
             idRegex = new RegExp(idRegexPattern);
-        } catch(e) {
+        } catch(_e) {
             idRegex = /^[a-zA-Z0-9\-_]{32}$/; // Fallback
         }
 
@@ -79,7 +79,7 @@ module.exports = function(RED) {
                                 break;
                             }
                         }
-                    } catch (e) {
+                    } catch (_e) {
                         // Payload was not valid JSON
                     }
                 }

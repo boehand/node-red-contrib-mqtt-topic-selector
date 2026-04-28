@@ -102,7 +102,7 @@ describe('MQTT Topic Selector Nodes', () => {
             let regex;
             try {
                 regex = new RegExp(invalidPattern);
-            } catch(e) {
+            } catch(_e) {
                 regex = /^[a-zA-Z0-9\-_]{32}$/; // Fallback
             }
             expect(regex.test('a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6')).toBe(true);
