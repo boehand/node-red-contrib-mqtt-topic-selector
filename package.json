@@ -32,12 +32,14 @@
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "test:verbose": "jest --verbose"
+    "test:verbose": "jest --verbose",
+    "lint": "eslint ."
   },
   "dependencies": {
     "mqtt": "^5.0.0"
   },
   "devDependencies": {
+    "eslint": "^8.57.0",
     "jest": "^30.0.0",
     "test-exclude": "^7.0.0"
   },
