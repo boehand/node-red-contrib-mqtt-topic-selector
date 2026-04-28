@@ -190,7 +190,7 @@ Apache-2.0
 
 ## Author
 
-Andreas Böhm (STFI, Chemnitz, Germany)
+Created by boehand using Gemini Pro 3.1 and Claude Haiku 4.5
 
 ## Changelog
 
@@ -216,6 +216,4 @@ https://github.com/boehand/node-red-contrib-mqtt-topic-selector
 - [mqtt.js](https://github.com/mqttjs/MQTT.js)
 
 
-## Author
 
-Created by boehand using Gemini Pro 3.1 and Claude Haiku 4.5
