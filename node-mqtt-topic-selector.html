@@ -369,7 +369,33 @@
 </script>
 
 <script type="text/html" data-help-name="mqtt-topic-selector-in">
-    <p>Verbindungsherstellung zu einem MQTT-Broker und Abonnement von Topic-Nachrichten.</p>
+    <p><b>MQTT Topic Selector (Input)</b></p>
+    <p>Connects to an MQTT broker and subscribes to messages from the specified topic. Includes advanced comfort features for device name mapping and topic browsing.</p>
+    <ul>
+        <li><b>Broker</b>: MQTT broker connection (required)</li>
+        <li><b>Topic</b>: Topic to subscribe to (supports wildcards, required)</li>
+        <li><b>QoS</b>: Quality of Service (0, 1, 2)</li>
+        <li><b>Comfort</b>: Enables device name mapping (Comfort Mode)</li>
+        <li><b>Recognition</b>: ID recognition type (exact, min/max, regex)</li>
+        <li><b>Info-Topic</b>: Suffix for info topics (default: /announce)</li>
+        <li><b>JSON Keys</b>: Fields to extract device names (default: name,title,deviceName)</li>
+    </ul>
+    <p><b>Outputs</b>:</p>
+    <ul>
+        <li><b>payload</b>: string | buffer – message payload</li>
+        <li><b>topic</b>: string – MQTT topic</li>
+        <li><b>qos</b>: number – Quality of Service</li>
+        <li><b>retain</b>: boolean – Retain flag</li>
+        <li><b>responseTopic</b>: string – MQTTv5 response topic</li>
+        <li><b>correlationData</b>: Buffer – MQTTv5 correlation data</li>
+        <li><b>contentType</b>: string – MQTTv5 content type</li>
+        <li><b>userProperties</b>: object – MQTTv5 user properties</li>
+        <li><b>messageExpiryInterval</b>: number – MQTTv5 expiry time (seconds)</li>
+    </ul>
+    <p><b>Comfort Mode</b>: Automatically maps cryptic device IDs to readable names using info topics and JSON keys. Use the <b>Listen</b> button to browse available topics and build the mapping.</p>
+    <p><b>Status</b>: Shows connection state and errors (e.g., connected, error, no broker).</p>
+    <p><b>Dynamic Subscription</b>: When enabled, the node can be controlled by input messages (actions: connect, disconnect, getSubscriptions, subscribe, unsubscribe).</p>
+    <p>See the README for more details and examples.</p>
 </script>
 
 <script type="text/html" data-template-name="mqtt-topic-selector-out">
@@ -484,5 +510,33 @@
 </script>
 
 <script type="text/html" data-help-name="mqtt-topic-selector-out">
-    <p>Verbindungsherstellung zu einem MQTT-Broker und publizieren von Topic-Nachrichten.</p>
+    <p><b>MQTT Topic Selector (Output)</b></p>
+    <p>Connects to an MQTT broker and publishes messages to the specified topic. Includes advanced comfort features for device name mapping and topic browsing.</p>
+    <ul>
+        <li><b>Broker</b>: MQTT broker connection (required)</li>
+        <li><b>Topic</b>: Topic to publish to (required)</li>
+        <li><b>QoS</b>: Quality of Service (0, 1, 2)</li>
+        <li><b>Retain</b>: Retain flag (true/false)</li>
+        <li><b>Comfort</b>: Enables device name mapping (Comfort Mode)</li>
+        <li><b>Recognition</b>: ID recognition type (exact, min/max, regex)</li>
+        <li><b>Info-Topic</b>: Suffix for info topics (default: /announce)</li>
+        <li><b>JSON Keys</b>: Fields to extract device names (default: name,title,deviceName)</li>
+    </ul>
+    <p><b>Inputs</b>:</p>
+    <ul>
+        <li><b>payload</b>: string | buffer – message payload to publish</li>
+        <li><b>topic</b>: string – MQTT topic (overrides configured topic)</li>
+        <li><b>qos</b>: number – Quality of Service (overrides configured QoS)</li>
+        <li><b>retain</b>: boolean – Retain flag (overrides configured retain)</li>
+        <li><b>responseTopic</b>: string – MQTTv5 response topic</li>
+        <li><b>correlationData</b>: Buffer – MQTTv5 correlation data</li>
+        <li><b>contentType</b>: string – MQTTv5 content type</li>
+        <li><b>userProperties</b>: object – MQTTv5 user properties</li>
+        <li><b>messageExpiryInterval</b>: number – MQTTv5 expiry time (seconds)</li>
+        <li><b>topicAlias</b>: number – MQTTv5 topic alias</li>
+    </ul>
+    <p><b>Comfort Mode</b>: Automatically maps cryptic device IDs to readable names using info topics and JSON keys. Use the <b>Listen</b> button to browse available topics and build the mapping.</p>
+    <p><b>Status</b>: Shows connection state and errors (e.g., connected, error, no broker).</p>
+    <p><b>Dynamic Control</b>: The node can be controlled by input messages (actions: connect, disconnect).</p>
+    <p>See the README for more details and examples.</p>
 </script>
