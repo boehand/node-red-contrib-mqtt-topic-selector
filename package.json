@@ -29,8 +29,16 @@
       "node-mqtt-topic-selector": "node-mqtt-topic-selector.js"
     }
   },
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:verbose": "jest --verbose"
+  },
   "dependencies": {
     "mqtt": "^5.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
   },
   "engines": {
     "node": ">=14.0.0"

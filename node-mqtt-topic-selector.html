@@ -86,14 +86,14 @@
         });
 
         function updatePatternVisibility() {
-            var val = $(configDivId).find('.pattern-select').val();
-            $(configDivId).find('.exact-row, .minmax-row, .custom-regex-row').hide();
+            var val = $(configDivId).find('.pattern-select, .pattern-select-out').val();
+            $(configDivId).find('.exact-row, .minmax-row, .custom-regex-row, .exact-row-out, .minmax-row-out, .custom-regex-row-out').hide();
             
-            if (val === "exact") $(configDivId).find('.exact-row').show();
-            else if (val === "minmax") $(configDivId).find('.minmax-row').show();
-            else if (val === "custom") $(configDivId).find('.custom-regex-row').show();
+            if (val === "exact") $(configDivId).find('.exact-row, .exact-row-out').show();
+            else if (val === "minmax") $(configDivId).find('.minmax-row, .minmax-row-out').show();
+            else if (val === "custom") $(configDivId).find('.custom-regex-row, .custom-regex-row-out').show();
         }
-        $(configDivId).find('.pattern-select').change(updatePatternVisibility);
+        $(configDivId).find('.pattern-select, .pattern-select-out').change(updatePatternVisibility);
         updatePatternVisibility(); 
 
         // --- Autocomplete ---
@@ -143,13 +143,13 @@
 
             var reqData = { 
                 broker: brokerId,
-                idPattern: $(configDivId).find('.pattern-select').val(),
-                idLengthExact: $(configDivId).find('.id-length-exact').val(),
-                idLengthMin: $(configDivId).find('.id-length-min').val(),
-                idLengthMax: $(configDivId).find('.id-length-max').val(),
-                idRegex: $(configDivId).find('.custom-regex-input').val(),
-                nameSuffix: $(configDivId).find('.name-suffix-input').val(),
-                nameKeys: $(configDivId).find('.name-keys-input').val()
+                idPattern: $(configDivId).find('.pattern-select, .pattern-select-out').val(),
+                idLengthExact: $(configDivId).find('.id-length-exact, .id-length-exact-out').val(),
+                idLengthMin: $(configDivId).find('.id-length-min, .id-length-min-out').val(),
+                idLengthMax: $(configDivId).find('.id-length-max, .id-length-max-out').val(),
+                idRegex: $(configDivId).find('.custom-regex-input, .custom-regex-input-out').val(),
+                nameSuffix: $(configDivId).find('.name-suffix-input, .name-suffix-input-out').val(),
+                nameKeys: $(configDivId).find('.name-keys-input, .name-keys-input-out').val()
             };
 
             $.ajax({
@@ -226,7 +226,7 @@
         category: 'network',
         defaults: {
             name: {value:""},
-            topic: {value:""}, 
+            topic: {value:"", required:true}, 
             qos: {value: "0"},
             retain: {value: "false"},
             broker: {type:"mqtt-broker", required:true},
@@ -292,56 +292,56 @@
     <div id="comfort-settings-in" style="display: none; margin-left: 20px; padding-left: 10px; border-left: 2px solid #ccc; margin-bottom: 15px; background: #f9f9f9; padding-top: 10px; padding-bottom: 5px;">
         
         <div class="form-row">
-            <label for="node-input-idPattern" style="width: 120px;">
-                <i class="fa fa-cogs"></i> Erkennung
-                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie später durch lesbare Namen ersetzen zu können."></i>
+            <label for=\"node-input-idPattern-out\" style=\"width: 120px;\">
+                <i class=\"fa fa-cogs\"></i> Erkennung
+                <i class=\"fa fa-info-circle\" title=\"Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie später durch lesbare Namen ersetzen zu können.\"></i>
             </label>
-            <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
+            <select id=\"node-input-idPattern-out\" class=\"pattern-select-out\" style=\"width: 250px;\">
                 <option value="exact">Exakte Länge</option>
                 <option value="minmax">Min/Max Länge</option>
                 <option value="custom">Regex (Profi)</option>
             </select>
         </div>
 
-        <div class="form-row exact-row" style="display: none;">
-            <label style="width: 120px;">
-                <i class="fa fa-arrows-h"></i> Zeichen
-                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen bei typischen Geräte-IDs)."></i>
+        <div class=\"form-row exact-row-out\" style=\"display: none;\">
+            <label style=\"width: 120px;\">
+                <i class=\"fa fa-arrows-h\"></i> Zeichen
+                <i class=\"fa fa-info-circle\" title=\"Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen bei typischen Geräte-IDs).\"></i>
             </label>
-            <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
+            <input type=\"number\" id=\"node-input-idLengthExact-out\" class=\"id-length-exact-out\" style=\"width: 60px; text-align: center;\">
         </div>
 
-        <div class="form-row minmax-row" style="display: none;">
-            <label style="width: 120px;">
-                <i class="fa fa-arrows-h"></i> Länge
-                <i class="fa fa-info-circle" title="Die minimale und maximale Zeichenlänge der gesuchten IDs."></i>
+        <div class=\"form-row minmax-row-out\" style=\"display: none;\">
+            <label style=\"width: 120px;\">
+                <i class=\"fa fa-arrows-h\"></i> Länge
+                <i class=\"fa fa-info-circle\" title=\"Die minimale und maximale Zeichenlänge der gesuchten IDs.\"></i>
             </label>
-            Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
-            Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
+            Min: <input type=\"number\" id=\"node-input-idLengthMin-out\" class=\"id-length-min-out\" style=\"width: 60px; text-align: center; margin-right: 10px;\">
+            Max: <input type=\"number\" id=\"node-input-idLengthMax-out\" class=\"id-length-max-out\" style=\"width: 60px; text-align: center;\">
         </div>
         
-        <div class="form-row custom-regex-row" style="display: none;">
-            <label for="node-input-idRegex" style="width: 120px;">
-                <i class="fa fa-code"></i> Regex
-                <i class="fa fa-info-circle" title="Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen."></i>
+        <div class=\"form-row custom-regex-row-out\" style=\"display: none;\">
+            <label for=\"node-input-idRegex-out\" style=\"width: 120px;\">
+                <i class=\"fa fa-code\"></i> Regex
+                <i class=\"fa fa-info-circle\" title=\"Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen.\"></i>
             </label>
-            <input type="text" id="node-input-idRegex" class="custom-regex-input" style="width: 250px;">
+            <input type=\"text\" id=\"node-input-idRegex-out\" class=\"custom-regex-input-out\" style=\"width: 250px;\">
         </div>
 
         <div class="form-row">
-            <label for="node-input-nameSuffix" style="width: 120px;">
-                <i class="fa fa-filter"></i> Info-Topic
-                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um nachzuschauen, welche ID zu welchem Gerät oder Namen gehört."></i>
+            <label for=\"node-input-nameSuffix-out\" style=\"width: 120px;\">
+                <i class=\"fa fa-filter\"></i> Info-Topic
+                <i class=\"fa fa-info-circle\" title=\"Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um nachzuschauen, welche ID zu welchem Gerät oder Namen gehört.\"></i>
             </label>
-            <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
+            <input type=\"text\" id=\"node-input-nameSuffix-out\" class=\"name-suffix-input-out\" style=\"width: 250px;\" placeholder=\"/announce\">
         </div>
 
         <div class="form-row" style="margin-bottom: 5px;">
-            <label for="node-input-nameKeys" style="width: 120px;">
-                <i class="fa fa-key"></i> JSON Keys 
-                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Dieser Name wird dann anstelle der ID angezeigt. Mehrere Felder mit Komma trennen."></i>
+            <label for=\"node-input-nameKeys-out\" style=\"width: 120px;\">
+                <i class=\"fa fa-key\"></i> JSON Keys 
+                <i class=\"fa fa-info-circle\" title=\"Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Dieser Name wird dann anstelle der ID angezeigt. Mehrere Felder mit Komma trennen.\"></i>
             </label>
-            <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
+            <input type=\"text\" id=\"node-input-nameKeys-out\" class=\"name-keys-input-out\" style=\"width: 250px;\" placeholder=\"name,title,deviceName\">
         </div>
     </div>
 

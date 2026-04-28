@@ -20,7 +20,7 @@ module.exports = function(RED) {
             idRegexPattern = `^[a-zA-Z0-9\\-_]{${minLen},${maxLen}}$`;
         }
 
-        // Sicherstellen, dass das Suffix mit einem Slash beginnt
+        // Ensure that the suffix starts with a slash
         let nameSuffix = req.query.nameSuffix || "/announce";
         if (!nameSuffix.startsWith('/')) nameSuffix = '/' + nameSuffix;
 
@@ -34,7 +34,7 @@ module.exports = function(RED) {
         }
 
         if (!brokerNode) {
-            return res.status(404).send("Broker nicht gefunden");
+            return res.status(404).send("Broker not found");
         }
 
         const protocol = (brokerNode.broker && brokerNode.broker.includes("://")) ? "" : "mqtt://";
@@ -59,14 +59,14 @@ module.exports = function(RED) {
             const val = payload.toString().trim();
             topics.add(topic);
             
-            // GENERISCHE Komfort-Logik - BUGFIX
+            // Generic comfort logic - BUGFIX
             if (topic.endsWith(nameSuffix)) {
-                // Schneide das Info-Topic am Ende ab, um den reinen Basis-Pfad zu erhalten
-                // Aus 'iounits/12345/announce' wird 'iounits/12345'
+                // Remove the info-topic at the end to get the pure base path
+                // From 'iounits/12345/announce' becomes 'iounits/12345'
                 const basePath = topic.slice(0, topic.length - nameSuffix.length);
                 const parts = basePath.split('/');
                 
-                // Die ID ist immer der allerletzte Knoten des Basis-Pfads (direkt vor dem Suffix!)
+                // The ID is always the last node of the base path (directly before the suffix!)
                 const foundId = parts[parts.length - 1];
 
                 if (foundId && idRegex.test(foundId)) {
@@ -75,18 +75,19 @@ module.exports = function(RED) {
                         for (let key of nameKeys) {
                             if (data[key]) {
                                 nameLookup[foundId] = data[key];
-                                console.log(`[MQTT-Browse] Mapping gefunden: ${foundId} -> ${data[key]}`);
+                                console.log(`[MQTT-Browse] Mapping found: ${foundId} -> ${data[key]}`);
                                 break;
                             }
                         }
                     } catch (e) {
-                        // Payload war kein gültiges JSON
+                        // Payload was not valid JSON
                     }
                 }
             }
         });
 
         client.on('error', (err) => {
+            console.error('[MQTT-Browse] Connection error:', err.message);
             client.end();
         });
 
@@ -99,7 +100,7 @@ module.exports = function(RED) {
         }, 2500);
     });
 
-    // --- Node Definitionen ---
+    // --- Node Definitions ---
     function MQTTInNode(n) {
         RED.nodes.createNode(this, n);
         this.topic = n.topic;
@@ -114,13 +115,16 @@ module.exports = function(RED) {
                 password: this.brokerConn.credentials?.password
             });
             this.client.on('connect', () => {
-                node.status({fill:"green",shape:"dot",text:"verbunden"});
+                node.status({fill:"green",shape:"dot",text:"connected"});
                 if (node.topic) node.client.subscribe(node.topic);
             });
             this.client.on('message', (t, p) => node.send({topic:t, payload:p.toString()}));
+            this.client.on('error', (err) => {
+                node.status({fill:"red",shape:"ring",text:"error: " + err.message});
+            });
             this.on('close', (done) => this.client.end(true, done));
         } else {
-            this.status({fill:"red", shape:"ring", text:"kein broker"});
+            this.status({fill:"red", shape:"ring", text:"no broker"});
         }
     }
     RED.nodes.registerType("mqtt-topic-selector-in", MQTTInNode);
@@ -141,7 +145,11 @@ module.exports = function(RED) {
             });
             
             this.client.on('connect', () => {
-                node.status({fill:"green",shape:"dot",text:"verbunden"});
+                node.status({fill:"green",shape:"dot",text:"connected"});
+            });
+
+            this.client.on('error', (err) => {
+                node.status({fill:"red",shape:"ring",text:"error: " + err.message});
             });
 
             this.on('input', (msg, send, done) => {
@@ -153,7 +161,7 @@ module.exports = function(RED) {
             });
             this.on('close', (done) => this.client.end(true, done));
         } else {
-            this.status({fill:"red", shape:"ring", text:"kein broker"});
+            this.status({fill:"red", shape:"ring", text:"no broker"});
         }
     }
     RED.nodes.registerType("mqtt-topic-selector-out", MQTTOutNode);
