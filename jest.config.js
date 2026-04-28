@@ -1,10 +1,11 @@
 module.exports = {
   testEnvironment: 'node',
   collectCoverageFrom: [
-    'node-mqtt-topic-selector.js',
+    '**/*.js',
     '!node-mqtt-topic-selector.html',
     '!test/**',
-    '!node_modules/**'
+    '!node_modules/**',
+    '!jest.config.js'
   ],
   coverageThreshold: {
     global: {
@@ -16,8 +17,5 @@ module.exports = {
   },
   testMatch: ['**/test/**/*.test.js'],
   verbose: true,
-  testTimeout: 10000,
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
-  }
+  testTimeout: 10000
 };
