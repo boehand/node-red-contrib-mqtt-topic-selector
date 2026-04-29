@@ -1,8 +1,8 @@
 {
-  "name": "node-red-contrib-mqtt-topic-selector",
+  "name": "@stfi/node-red-contrib-mqtt-topic-selector",
   "version": "1.0.0",
   "description": "A Node-RED node for selecting topics from an MQTT broker via live-listening.",
-  "author": "Andreas Böhm",
+  "author": "boehand",
   "organization": "STFI, Chemnitz (Germany)",
     "repository": {
     "type": "git",
