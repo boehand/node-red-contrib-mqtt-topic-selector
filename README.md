@@ -1,16 +1,14 @@
 # node-red-contrib-mqtt-topic-selector
 
-A Node-RED node for selecting and listening to topics from an MQTT broker with advanced comfort features based on the *node-red core-node for mqtt* ([Link1](https://github.com/node-red/node-red/blob/master/packages/node_modules/%40node-red/nodes/core/network/10-mqtt.html), [Link2](https://github.com/node-red/node-red/blob/master/packages/node_modules/%40node-red/nodes/core/network/10-mqtt.js)) and based on *node-red-contrib-opcua-item-selector* ([Link](https://github.com/boehand/node-red-contrib-opcua-item-selector)).
-
+A Node-RED node for selecting and listening to MQTT topics from a broker with advanced device mapping features.
 
 ## Features
 
-- **MQTT Input Node** - Subscribe and receive MQTT messages
-- **MQTT Output Node** - Publish messages to MQTT topics
-- **Comfort Mode** - Automatic device ID recognition and mapping to readable names
-- **Topic Browser** - Live listening to the broker to browse available topics
-- **Flexible ID Recognition** - Exact length, min/max length, or custom regex
-- **Info Topics** - Automatic extraction of device information from special topics
+- **MQTT Input Node** - Subscribe to MQTT messages
+- **MQTT Output Node** - Publish MQTT messages  
+- **Device Mapping** - Automatic device ID to name recognition
+- **Topic Browser** - Live connection to browse available topics
+- **Custom ID Recognition** - Exact length, min/max length, or regex patterns
 
 ## Installation
 
@@ -18,86 +16,22 @@ A Node-RED node for selecting and listening to topics from an MQTT broker with a
 npm install node-red-contrib-mqtt-topic-selector
 ```
 
-Or search for `mqtt-topic-selector` in the Node-RED Palette Manager and install.
-
 ## Requirements
 
 - Node-RED >= 1.0.0
 - Node.js >= 14.0.0
-- MQTT Broker (e.g., Mosquitto)
+- MQTT Broker
 
-## Configuration
+## Quick Start
 
-### Input Node (mqtt-topic-selector-in)
+1. Drag a MQTT Input or Output node into your Node-RED flow
+2. Configure the broker connection
+3. Specify the topic to subscribe/publish to
+4. (Optional) Enable device mapping for automatic device name recognition
 
-Receives messages from MQTT topics.
+## License
 
-**Properties:**
-
-| Option | Description | Required |
-|--------|-------------|----------|
-| **Broker** | MQTT Broker connection | Yes |
-| **Topic** | Topic to subscribe to (supports wildcards) | Yes |
-| **QoS** | Quality of Service (0, 1, 2) | No |
-| **Comfort** | Enables device name mapping | No |
-| **Recognition** | Type of ID recognition | No |
-
-### Output Node (mqtt-topic-selector-out)
-
-Publishes messages to MQTT topics.
-
-**Properties:**
-
-| Option | Description | Required |
-|--------|-------------|----------|
-| **Broker** | MQTT Broker connection | Yes |
-| **Topic** | Destination topic for publishing | Yes |
-| **QoS** | Quality of Service (0, 1, 2) | No |
-| **Retain** | Keep message (true/false) | No |
-| **Comfort** | Enables device name mapping | No |
-
-### Comfort Mode
-
-With **Comfort Mode**, you can automatically create a mapping between cryptic device IDs and readable device names.
-
-#### Advanced Settings
-
-**Recognition (ID-Pattern):**
-- **Exact Length** - IDs have a fixed character length (e.g., 32 characters)
-- **Min/Max Length** - IDs have a variable length within the specified range
-- **Regex (Pro)** - Use custom regular expression
-
-**Info-Topic:**
-- Default: `/announce`
-- The node searches for topics that end with this suffix
-- Example: `devices/abc123def456/announce`
-
-**JSON Keys:**
-- Comma-separated list of JSON field names
-- The node tries to extract the name from these fields
-- Default: `name,title,deviceName`
-- Order determines priority
-
-#### Topic Browser
-
-Click the **"Listen"** button to:
-1. Create a live connection to the broker
-2. Collect all available topics
-3. Analyze info-topics and extract device names
-4. Create a searchable list of popular topics
-
-## Examples
-
-### Simple Receiving
-
-Configure:
-- Topic: `home/sensor/temperature`
-- QoS: 1
-
-### With Comfort Mode
-
-If the following topics exist:
-- `devices/a1b2c3d4e5f6/announce` → `{"name": "Factory Temperature"}`
+Apache-2.0
 - `devices/a1b2c3d4e5f6/temp` → `22.5`
 
 Will display:
