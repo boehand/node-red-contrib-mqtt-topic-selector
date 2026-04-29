@@ -114,10 +114,6 @@ The node displays its status:
 4. **Inject Node:** Creates test payload
 5. **Debug Node:** Shows input messages
 
-```
-[Inject] --> [MQTT Output] --> [MQTT Input] --> [Debug]
-```
-
 ## License
 
 Apache-2.0
@@ -125,18 +121,6 @@ Apache-2.0
 ## Author
 
 Created by boehand using Gemini Pro 3.1 and Claude Haiku 4.5
-
-## Changelog
-
-### Version 1.0.0
-
-- ✅ Input and Output Nodes implemented
-- ✅ Comfort Mode with device ID recognition
-- ✅ Topic Browser with live listening
-- ✅ Flexible ID recognition (exact, min/max, regex)
-- ✅ Error handling and status display
-- ✅ Memory leak fixes
-- ✅ Unique HTML element IDs for both node types
 
 ## Support
 
