@@ -3,32 +3,28 @@
         if (this.name) return this.name;
         var raw = this.topic;
         if (!raw) return this.type === 'mqtt-topic-selector-in' ? "mqtt-topic-selector-in" : "mqtt-topic-selector-out";
-        
+
         var isComfort = (this.comfortMode === "true" || this.comfortMode === true);
         if (isComfort && this.fetchedLookup) {
             var lookup = {};
             try { lookup = JSON.parse(this.fetchedLookup); } catch(e) {}
             var lbl = raw;
             Object.keys(lookup).forEach(function(id) {
-                if (lbl.includes(id)) lbl = lbl.split(id).join(lookup[id]); 
+                if (lbl.includes(id)) lbl = lbl.split(id).join(lookup[id]);
             });
-            // Die fehlerhafte slash-Ersetzung wurde hier entfernt
-            return lbl; 
+            return lbl;
         }
         return raw;
     }
 
     function setupTopicBrowser(buttonId, brokerInputId, realTopicId, visualTopicId, comfortId, topicsStorageId, lookupStorageId, labelTopicId, configDivId, toggleBtnId) {
-        
+
         function getLabeledTopic(raw, lookup, isComfort) {
             if (!isComfort || !lookup || !raw) return raw;
             let label = raw;
             Object.keys(lookup).forEach(id => {
-                if (label.includes(id)) {
-                    label = label.split(id).join(lookup[id]); 
-                }
+                if (label.includes(id)) label = label.split(id).join(lookup[id]);
             });
-            // Die fehlerhafte slash-Ersetzung wurde hier entfernt
             return label;
         }
 
@@ -43,7 +39,7 @@
         function applyComfortMode() {
             let isComfort = ($(comfortId).val() === "true");
             let currentRaw = $(realTopicId).val();
-            
+
             if (isComfort) {
                 $(toggleBtnId).parent().show();
                 $(labelTopicId).html('<i class="fa fa-tasks"></i> labeled Topic');
@@ -52,15 +48,12 @@
                 $(toggleBtnId).parent().hide();
                 $(configDivId).hide();
                 $(toggleBtnId).find("i").removeClass("fa-caret-up").addClass("fa-caret-down");
-                
                 $(labelTopicId).html('<i class="fa fa-tasks"></i> Topic');
                 $(visualTopicId).val(currentRaw);
             }
-            
-            // NEU: Striktes Deduplizieren der Liste, damit nichts mehr doppelt auftaucht!
+
             let acData = [];
             let seenLabels = new Set();
-            
             savedTopics.forEach(function(t) {
                 let lbl = getLabeledTopic(t, savedLookup, isComfort);
                 if (!seenLabels.has(lbl)) {
@@ -68,11 +61,9 @@
                     acData.push({ label: lbl, value: t });
                 }
             });
-            
             $(visualTopicId).autocomplete("option", "source", acData);
         }
 
-        // --- UI Events ---
         $(toggleBtnId).click(function(e) {
             e.preventDefault();
             var icon = $(this).find("i");
@@ -86,24 +77,22 @@
         });
 
         function updatePatternVisibility() {
-            var val = $(configDivId).find('.pattern-select, .pattern-select-out').val();
-            $(configDivId).find('.exact-row, .minmax-row, .custom-regex-row, .exact-row-out, .minmax-row-out, .custom-regex-row-out').hide();
-            
-            if (val === "exact") $(configDivId).find('.exact-row, .exact-row-out').show();
-            else if (val === "minmax") $(configDivId).find('.minmax-row, .minmax-row-out').show();
-            else if (val === "custom") $(configDivId).find('.custom-regex-row, .custom-regex-row-out').show();
+            var val = $(configDivId).find('.pattern-select').val();
+            $(configDivId).find('.exact-row, .minmax-row, .custom-regex-row').hide();
+            if (val === "exact")  $(configDivId).find('.exact-row').show();
+            else if (val === "minmax") $(configDivId).find('.minmax-row').show();
+            else if (val === "custom") $(configDivId).find('.custom-regex-row').show();
         }
-        $(configDivId).find('.pattern-select, .pattern-select-out').change(updatePatternVisibility);
-        updatePatternVisibility(); 
+        $(configDivId).find('.pattern-select').change(updatePatternVisibility);
+        updatePatternVisibility();
 
-        // --- Autocomplete ---
         $(visualTopicId).autocomplete({
             minLength: 0,
-            source: [], 
+            source: [],
             select: function(event, ui) {
-                $(realTopicId).val(ui.item.value); 
+                $(realTopicId).val(ui.item.value);
                 $(visualTopicId).val(ui.item.label);
-                return false; 
+                return false;
             },
             focus: function(event, ui) {
                 $(visualTopicId).val(ui.item.label);
@@ -115,8 +104,7 @@
 
         $(visualTopicId).on('blur', function() {
             if ($(comfortId).val() === "true") {
-                let currentRaw = $(realTopicId).val();
-                $(this).val(getLabeledTopic(currentRaw, savedLookup, true));
+                $(this).val(getLabeledTopic($(realTopicId).val(), savedLookup, true));
             }
         });
 
@@ -129,10 +117,9 @@
         applyComfortMode();
         $(comfortId).change(function() { applyComfortMode(); });
 
-        // --- AJAX Request ---
         $(buttonId).click(function() {
             var brokerId = $(brokerInputId).val();
-            if(!brokerId || brokerId === "_ADD_") {
+            if (!brokerId || brokerId === "_ADD_") {
                 RED.notify("Bitte Broker wählen und deployen.", "warning");
                 return;
             }
@@ -141,38 +128,39 @@
             btn.html('<i class="fa fa-spinner fa-spin"></i> Listen...');
             btn.prop('disabled', true);
 
-            var reqData = { 
-                broker: brokerId,
-                idPattern: $(configDivId).find('.pattern-select, .pattern-select-out').val(),
-                idLengthExact: $(configDivId).find('.id-length-exact, .id-length-exact-out').val(),
-                idLengthMin: $(configDivId).find('.id-length-min, .id-length-min-out').val(),
-                idLengthMax: $(configDivId).find('.id-length-max, .id-length-max-out').val(),
-                idRegex: $(configDivId).find('.custom-regex-input, .custom-regex-input-out').val(),
-                nameSuffix: $(configDivId).find('.name-suffix-input, .name-suffix-input-out').val(),
-                nameKeys: $(configDivId).find('.name-keys-input, .name-keys-input-out').val()
+            var reqData = {
+                broker:       brokerId,
+                idPattern:    $(configDivId).find('.pattern-select').val(),
+                idLengthExact:$(configDivId).find('.id-length-exact').val(),
+                idLengthMin:  $(configDivId).find('.id-length-min').val(),
+                idLengthMax:  $(configDivId).find('.id-length-max').val(),
+                idRegex:      $(configDivId).find('.custom-regex-input').val(),
+                nameSuffix:   $(configDivId).find('.name-suffix-input').val(),
+                nameKeys:     $(configDivId).find('.name-keys-input').val()
             };
 
             $.ajax({
                 url: '/mqtt-browse',
                 type: 'GET',
-                data: reqData, 
+                data: reqData,
                 success: function(data) {
                     btn.html(originalText);
                     btn.prop('disabled', false);
-
-                    if(data.topics && data.topics.length > 0) {
+                    if (!data.connected) {
+                        var msg = data.error ? "Verbindung fehlgeschlagen: " + data.error : "Verbindung zum Broker fehlgeschlagen (TLS, Port oder Zugangsdaten prüfen).";
+                        RED.notify(msg, "error");
+                        return;
+                    }
+                    if (data.topics && data.topics.length > 0) {
                         savedTopics = data.topics;
                         savedLookup = data.lookup || {};
-
                         $(topicsStorageId).val(JSON.stringify(savedTopics));
                         $(lookupStorageId).val(JSON.stringify(savedLookup));
-
                         applyComfortMode();
                         $(visualTopicId).autocomplete("search", "");
-
                         RED.notify(data.topics.length + " Topics empfangen.", "success");
                     } else {
-                        RED.notify("Keine Topics gefunden.", "info");
+                        RED.notify("Verbunden, aber keine Topics empfangen (keine retained Messages und kein Live-Traffic in 5 s).", "info");
                     }
                 },
                 error: function() {
@@ -184,83 +172,96 @@
         });
     }
 
-    // --- INPUT NODE REGISTRIERUNG ---
-    RED.nodes.registerType('mqtt-topic-selector-in',{
+    // --- INPUT NODE ---
+    RED.nodes.registerType('mqtt-topic-selector-in', {
         category: 'network',
         defaults: {
-            name: {value:""},
-            topic: {value:"", required:true}, 
-            qos: {value: "0"},
-            broker: {type:"mqtt-broker", required:true},
-            comfortMode: {value: "true"}, 
-            idPattern: {value: "exact"},
-            idLengthExact: {value: 32},
-            idLengthMin: {value: 10},
-            idLengthMax: {value: 40},
-            idRegex: {value: "^[a-zA-Z0-9\\-_]{32}$"},
-            nameSuffix: {value: "/announce"},
-            nameKeys: {value: "name,title,deviceName"},
-            fetchedTopics: {value: "[]"},
-            fetchedLookup: {value: "{}"}
+            name:           { value: "" },
+            topic:          { value: "" },
+            qos:            { value: "0" },
+            broker:         { type: "mqtt-broker", required: true },
+            comfortMode:    { value: "true" },
+            idPattern:      { value: "exact" },
+            idLengthExact:  { value: 32 },
+            idLengthMin:    { value: 10 },
+            idLengthMax:    { value: 40 },
+            idRegex:        { value: "^[a-zA-Z0-9\\-_]{32}$" },
+            nameSuffix:     { value: "/announce" },
+            nameKeys:       { value: "name,title,deviceName" },
+            fetchedTopics:  { value: "[]" },
+            fetchedLookup:  { value: "{}" }
         },
-        color:"#d8bfd8",
-        inputs:0,
-        outputs:1,
+        color: "#d8bfd8",
+        inputs: 0,
+        outputs: 1,
         icon: "bridge.svg",
         label: generateNodeLabel,
         labelStyle: function() { return this.name ? "node_label_italic" : ""; },
         oneditprepare: function() {
-            if (!this.idPattern) $("#node-input-idPattern").val("exact");
+            if (!this.idPattern)     $("#node-input-idPattern").val("exact");
             if (!this.idLengthExact) $("#node-input-idLengthExact").val(32);
-            if (!this.idLengthMin) $("#node-input-idLengthMin").val(10);
-            if (!this.idLengthMax) $("#node-input-idLengthMax").val(40);
-            if (!this.nameSuffix) $("#node-input-nameSuffix").val("/announce");
-            if (!this.nameKeys) $("#node-input-nameKeys").val("name,title,deviceName");
+            if (!this.idLengthMin)   $("#node-input-idLengthMin").val(10);
+            if (!this.idLengthMax)   $("#node-input-idLengthMax").val(40);
+            if (!this.nameSuffix)    $("#node-input-nameSuffix").val("/announce");
+            if (!this.nameKeys)      $("#node-input-nameKeys").val("name,title,deviceName");
 
-            setupTopicBrowser('#node-browse-button-in', '#node-input-broker', '#node-input-topic', '#node-input-topicVisual', '#node-input-comfortMode', '#node-input-fetchedTopics', '#node-input-fetchedLookup', '#label-topic-in', '#comfort-settings-in', '#advanced-toggle-in');
+            setupTopicBrowser(
+                '#node-browse-button-in', '#node-input-broker',
+                '#node-input-topic', '#node-input-topicVisual',
+                '#node-input-comfortMode',
+                '#node-input-fetchedTopics', '#node-input-fetchedLookup',
+                '#label-topic-in', '#comfort-settings-in', '#advanced-toggle-in'
+            );
         }
     });
 
-    // --- OUTPUT NODE REGISTRIERUNG ---
-    RED.nodes.registerType('mqtt-topic-selector-out',{
+    // --- OUTPUT NODE ---
+    RED.nodes.registerType('mqtt-topic-selector-out', {
         category: 'network',
         defaults: {
-            name: {value:""},
-            topic: {value:"", required:true}, 
-            qos: {value: "0"},
-            retain: {value: "false"},
-            broker: {type:"mqtt-broker", required:true},
-            comfortMode: {value: "true"},
-            idPattern: {value: "exact"},
-            idLengthExact: {value: 32},
-            idLengthMin: {value: 10},
-            idLengthMax: {value: 40},
-            idRegex: {value: "^[a-zA-Z0-9\\-_]{32}$"},
-            nameSuffix: {value: "/announce"},
-            nameKeys: {value: "name,title,deviceName"},
-            fetchedTopics: {value: "[]"},
-            fetchedLookup: {value: "{}"}
+            name:           { value: "" },
+            topic:          { value: "" },
+            qos:            { value: "0" },
+            retain:         { value: "false" },
+            broker:         { type: "mqtt-broker", required: true },
+            comfortMode:    { value: "true" },
+            idPattern:      { value: "exact" },
+            idLengthExact:  { value: 32 },
+            idLengthMin:    { value: 10 },
+            idLengthMax:    { value: 40 },
+            idRegex:        { value: "^[a-zA-Z0-9\\-_]{32}$" },
+            nameSuffix:     { value: "/announce" },
+            nameKeys:       { value: "name,title,deviceName" },
+            fetchedTopics:  { value: "[]" },
+            fetchedLookup:  { value: "{}" }
         },
-        color:"#d8bfd8",
-        inputs:1,
-        outputs:0,
+        color: "#d8bfd8",
+        inputs: 1,
+        outputs: 0,
         icon: "bridge.svg",
         align: "right",
         label: generateNodeLabel,
         labelStyle: function() { return this.name ? "node_label_italic" : ""; },
         oneditprepare: function() {
-            if (!this.idPattern) $("#node-input-idPattern").val("exact");
+            if (!this.idPattern)     $("#node-input-idPattern").val("exact");
             if (!this.idLengthExact) $("#node-input-idLengthExact").val(32);
-            if (!this.idLengthMin) $("#node-input-idLengthMin").val(10);
-            if (!this.idLengthMax) $("#node-input-idLengthMax").val(40);
-            if (!this.nameSuffix) $("#node-input-nameSuffix").val("/announce");
-            if (!this.nameKeys) $("#node-input-nameKeys").val("name,title,deviceName");
+            if (!this.idLengthMin)   $("#node-input-idLengthMin").val(10);
+            if (!this.idLengthMax)   $("#node-input-idLengthMax").val(40);
+            if (!this.nameSuffix)    $("#node-input-nameSuffix").val("/announce");
+            if (!this.nameKeys)      $("#node-input-nameKeys").val("name,title,deviceName");
 
-            setupTopicBrowser('#node-browse-button-out', '#node-input-broker', '#node-input-topic', '#node-input-topicVisual', '#node-input-comfortModeOut', '#node-input-fetchedTopics', '#node-input-fetchedLookup', '#label-topic-out', '#comfort-settings-out', '#advanced-toggle-out');
+            setupTopicBrowser(
+                '#node-browse-button-out', '#node-input-broker',
+                '#node-input-topic', '#node-input-topicVisual',
+                '#node-input-comfortModeOut',
+                '#node-input-fetchedTopics', '#node-input-fetchedLookup',
+                '#label-topic-out', '#comfort-settings-out', '#advanced-toggle-out'
+            );
         }
     });
 </script>
 
+<!-- ==================== INPUT NODE TEMPLATE ==================== -->
 <script type="text/html" data-template-name="mqtt-topic-selector-in">
     <input type="hidden" id="node-input-fetchedTopics">
     <input type="hidden" id="node-input-fetchedLookup">
@@ -270,11 +271,11 @@
         <label for="node-input-broker"><i class="fa fa-globe"></i> Broker</label>
         <input type="text" id="node-input-broker">
     </div>
-    
+
     <div class="form-row">
         <label for="node-input-comfortMode">
             <i class="fa fa-magic"></i> Komfort
-            <i class="fa fa-info-circle" title="Baut im Hintergrund ein 'Wörterbuch' aus den empfangenen Info-Topics auf. Kryptische IDs werden damit in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
+            <i class="fa fa-info-circle" title="Baut im Hintergrund ein Wörterbuch aus Info-Topics auf. Kryptische IDs werden in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
         </label>
         <select id="node-input-comfortMode" style="width:125px">
             <option value="false">Aus</option>
@@ -290,58 +291,58 @@
     </div>
 
     <div id="comfort-settings-in" style="display: none; margin-left: 20px; padding-left: 10px; border-left: 2px solid #ccc; margin-bottom: 15px; background: #f9f9f9; padding-top: 10px; padding-bottom: 5px;">
-        
+
         <div class="form-row">
-            <label for=\"node-input-idPattern-out\" style=\"width: 120px;\">
-                <i class=\"fa fa-cogs\"></i> Erkennung
-                <i class=\"fa fa-info-circle\" title=\"Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie später durch lesbare Namen ersetzen zu können.\"></i>
+            <label for="node-input-idPattern" style="width: 120px;">
+                <i class="fa fa-cogs"></i> Erkennung
+                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie durch lesbare Namen ersetzen zu können."></i>
             </label>
-            <select id=\"node-input-idPattern-out\" class=\"pattern-select-out\" style=\"width: 250px;\">
+            <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
                 <option value="exact">Exakte Länge</option>
                 <option value="minmax">Min/Max Länge</option>
                 <option value="custom">Regex (Profi)</option>
             </select>
         </div>
 
-        <div class=\"form-row exact-row-out\" style=\"display: none;\">
-            <label style=\"width: 120px;\">
-                <i class=\"fa fa-arrows-h\"></i> Zeichen
-                <i class=\"fa fa-info-circle\" title=\"Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen bei typischen Geräte-IDs).\"></i>
+        <div class="form-row exact-row" style="display: none;">
+            <label style="width: 120px;">
+                <i class="fa fa-arrows-h"></i> Zeichen
+                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen)."></i>
             </label>
-            <input type=\"number\" id=\"node-input-idLengthExact-out\" class=\"id-length-exact-out\" style=\"width: 60px; text-align: center;\">
+            <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
         </div>
 
-        <div class=\"form-row minmax-row-out\" style=\"display: none;\">
-            <label style=\"width: 120px;\">
-                <i class=\"fa fa-arrows-h\"></i> Länge
-                <i class=\"fa fa-info-circle\" title=\"Die minimale und maximale Zeichenlänge der gesuchten IDs.\"></i>
+        <div class="form-row minmax-row" style="display: none;">
+            <label style="width: 120px;">
+                <i class="fa fa-arrows-h"></i> Länge
+                <i class="fa fa-info-circle" title="Die minimale und maximale Zeichenlänge der gesuchten IDs."></i>
             </label>
-            Min: <input type=\"number\" id=\"node-input-idLengthMin-out\" class=\"id-length-min-out\" style=\"width: 60px; text-align: center; margin-right: 10px;\">
-            Max: <input type=\"number\" id=\"node-input-idLengthMax-out\" class=\"id-length-max-out\" style=\"width: 60px; text-align: center;\">
+            Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
+            Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
         </div>
-        
-        <div class=\"form-row custom-regex-row-out\" style=\"display: none;\">
-            <label for=\"node-input-idRegex-out\" style=\"width: 120px;\">
-                <i class=\"fa fa-code\"></i> Regex
-                <i class=\"fa fa-info-circle\" title=\"Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen.\"></i>
+
+        <div class="form-row custom-regex-row" style="display: none;">
+            <label for="node-input-idRegex" style="width: 120px;">
+                <i class="fa fa-code"></i> Regex
+                <i class="fa fa-info-circle" title="Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen."></i>
             </label>
-            <input type=\"text\" id=\"node-input-idRegex-out\" class=\"custom-regex-input-out\" style=\"width: 250px;\">
+            <input type="text" id="node-input-idRegex" class="custom-regex-input" style="width: 250px;">
         </div>
 
         <div class="form-row">
-            <label for=\"node-input-nameSuffix-out\" style=\"width: 120px;\">
-                <i class=\"fa fa-filter\"></i> Info-Topic
-                <i class=\"fa fa-info-circle\" title=\"Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um nachzuschauen, welche ID zu welchem Gerät oder Namen gehört.\"></i>
+            <label for="node-input-nameSuffix" style="width: 120px;">
+                <i class="fa fa-filter"></i> Info-Topic
+                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um IDs zu Gerätenamen zuzuordnen."></i>
             </label>
-            <input type=\"text\" id=\"node-input-nameSuffix-out\" class=\"name-suffix-input-out\" style=\"width: 250px;\" placeholder=\"/announce\">
+            <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
         </div>
 
         <div class="form-row" style="margin-bottom: 5px;">
-            <label for=\"node-input-nameKeys-out\" style=\"width: 120px;\">
-                <i class=\"fa fa-key\"></i> JSON Keys 
-                <i class=\"fa fa-info-circle\" title=\"Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Dieser Name wird dann anstelle der ID angezeigt. Mehrere Felder mit Komma trennen.\"></i>
+            <label for="node-input-nameKeys" style="width: 120px;">
+                <i class="fa fa-key"></i> JSON Keys
+                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Mehrere Felder mit Komma trennen."></i>
             </label>
-            <input type=\"text\" id=\"node-input-nameKeys-out\" class=\"name-keys-input-out\" style=\"width: 250px;\" placeholder=\"name,title,deviceName\">
+            <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
         </div>
     </div>
 
@@ -357,10 +358,14 @@
             <a id="node-browse-button-in" class="red-ui-button" style="margin-left: 10px; white-space: nowrap;"><i class="fa fa-search"></i> Listen</a>
         </div>
     </div>
-    
+
     <div class="form-row">
         <label for="node-input-qos"><i class="fa fa-empire"></i> QoS</label>
-        <select id="node-input-qos" style="width:125px"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+        <select id="node-input-qos" style="width:125px">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -370,34 +375,21 @@
 
 <script type="text/html" data-help-name="mqtt-topic-selector-in">
     <p><b>MQTT Topic Selector (Input)</b></p>
-    <p>Connects to an MQTT broker and subscribes to messages from the specified topic. Includes advanced comfort features for device name mapping and topic browsing.</p>
+    <p>Subscribes to an MQTT broker topic. Uses the <b>mqtt-broker</b> config node for the full connection setup including TLS, protocol version (v3/v4/v5), keepalive, clean session, birth/will/close messages, and credentials.</p>
     <ul>
-        <li><b>Broker</b>: MQTT broker connection (required)</li>
+        <li><b>Broker</b>: MQTT broker config node (required)</li>
         <li><b>Topic</b>: Topic to subscribe to (supports wildcards, required)</li>
         <li><b>QoS</b>: Quality of Service (0, 1, 2)</li>
-        <li><b>Comfort</b>: Enables device name mapping (Comfort Mode)</li>
-        <li><b>Recognition</b>: ID recognition type (exact, min/max, regex)</li>
-        <li><b>Info-Topic</b>: Suffix for info topics (default: /announce)</li>
+        <li><b>Comfort</b>: Enables device name mapping</li>
+        <li><b>Erkennung</b>: ID recognition type (exact length, min/max, regex)</li>
+        <li><b>Info-Topic</b>: Suffix for device-announce topics (default: /announce)</li>
         <li><b>JSON Keys</b>: Fields to extract device names (default: name,title,deviceName)</li>
     </ul>
-    <p><b>Outputs</b>:</p>
-    <ul>
-        <li><b>payload</b>: string | buffer – message payload</li>
-        <li><b>topic</b>: string – MQTT topic</li>
-        <li><b>qos</b>: number – Quality of Service</li>
-        <li><b>retain</b>: boolean – Retain flag</li>
-        <li><b>responseTopic</b>: string – MQTTv5 response topic</li>
-        <li><b>correlationData</b>: Buffer – MQTTv5 correlation data</li>
-        <li><b>contentType</b>: string – MQTTv5 content type</li>
-        <li><b>userProperties</b>: object – MQTTv5 user properties</li>
-        <li><b>messageExpiryInterval</b>: number – MQTTv5 expiry time (seconds)</li>
-    </ul>
-    <p><b>Comfort Mode</b>: Automatically maps cryptic device IDs to readable names using info topics and JSON keys. Use the <b>Listen</b> button to browse available topics and build the mapping.</p>
-    <p><b>Status</b>: Shows connection state and errors (e.g., connected, error, no broker).</p>
-    <p><b>Dynamic Subscription</b>: When enabled, the node can be controlled by input messages (actions: connect, disconnect, getSubscriptions, subscribe, unsubscribe).</p>
-    <p>See the README for more details and examples.</p>
+    <p><b>Outputs</b>: <code>payload</code>, <code>topic</code>, <code>qos</code>, <code>retain</code>, and MQTTv5 properties (<code>responseTopic</code>, <code>correlationData</code>, <code>contentType</code>, <code>userProperties</code>, <code>messageExpiryInterval</code>).</p>
+    <p><b>Comfort Mode</b>: Use the <b>Listen</b> button to browse topics and build a device-name mapping. IDs in topic names are replaced with readable labels in the dropdown.</p>
 </script>
 
+<!-- ==================== OUTPUT NODE TEMPLATE ==================== -->
 <script type="text/html" data-template-name="mqtt-topic-selector-out">
     <input type="hidden" id="node-input-fetchedTopics">
     <input type="hidden" id="node-input-fetchedLookup">
@@ -407,11 +399,11 @@
         <label for="node-input-broker"><i class="fa fa-globe"></i> Broker</label>
         <input type="text" id="node-input-broker">
     </div>
-    
+
     <div class="form-row">
         <label for="node-input-comfortModeOut">
             <i class="fa fa-magic"></i> Komfort
-            <i class="fa fa-info-circle" title="Baut im Hintergrund ein 'Wörterbuch' aus den empfangenen Info-Topics auf. Kryptische IDs werden damit in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
+            <i class="fa fa-info-circle" title="Baut im Hintergrund ein Wörterbuch aus Info-Topics auf. Kryptische IDs werden in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
         </label>
         <select id="node-input-comfortModeOut" style="width:125px">
             <option value="false">Aus</option>
@@ -427,11 +419,11 @@
     </div>
 
     <div id="comfort-settings-out" style="display: none; margin-left: 20px; padding-left: 10px; border-left: 2px solid #ccc; margin-bottom: 15px; background: #f9f9f9; padding-top: 10px; padding-bottom: 5px;">
-        
+
         <div class="form-row">
             <label for="node-input-idPattern" style="width: 120px;">
                 <i class="fa fa-cogs"></i> Erkennung
-                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie später durch lesbare Namen ersetzen zu können."></i>
+                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie durch lesbare Namen ersetzen zu können."></i>
             </label>
             <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
                 <option value="exact">Exakte Länge</option>
@@ -443,7 +435,7 @@
         <div class="form-row exact-row" style="display: none;">
             <label style="width: 120px;">
                 <i class="fa fa-arrows-h"></i> Zeichen
-                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen bei typischen Geräte-IDs)."></i>
+                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen)."></i>
             </label>
             <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
         </div>
@@ -456,7 +448,7 @@
             Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
             Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
         </div>
-        
+
         <div class="form-row custom-regex-row" style="display: none;">
             <label for="node-input-idRegex" style="width: 120px;">
                 <i class="fa fa-code"></i> Regex
@@ -468,15 +460,15 @@
         <div class="form-row">
             <label for="node-input-nameSuffix" style="width: 120px;">
                 <i class="fa fa-filter"></i> Info-Topic
-                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um nachzuschauen, welche ID zu welchem Gerät oder Namen gehört."></i>
+                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um IDs zu Gerätenamen zuzuordnen."></i>
             </label>
             <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
         </div>
 
         <div class="form-row" style="margin-bottom: 5px;">
             <label for="node-input-nameKeys" style="width: 120px;">
-                <i class="fa fa-key"></i> JSON Keys 
-                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Dieser Name wird dann anstelle der ID angezeigt. Mehrere Felder mit Komma trennen."></i>
+                <i class="fa fa-key"></i> JSON Keys
+                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Mehrere Felder mit Komma trennen."></i>
             </label>
             <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
         </div>
@@ -494,14 +486,21 @@
             <a id="node-browse-button-out" class="red-ui-button" style="margin-left: 10px; white-space: nowrap;"><i class="fa fa-search"></i> Listen</a>
         </div>
     </div>
-    
+
     <div class="form-row">
         <label for="node-input-qos"><i class="fa fa-empire"></i> QoS</label>
-        <select id="node-input-qos" style="width:125px"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+        <select id="node-input-qos" style="width:125px">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-retain"><i class="fa fa-history"></i> Retain</label>
-        <select id="node-input-retain" style="width:125px"><option value="false">false</option><option value="true">true</option></select>
+        <select id="node-input-retain" style="width:125px">
+            <option value="false">false</option>
+            <option value="true">true</option>
+        </select>
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -511,32 +510,17 @@
 
 <script type="text/html" data-help-name="mqtt-topic-selector-out">
     <p><b>MQTT Topic Selector (Output)</b></p>
-    <p>Connects to an MQTT broker and publishes messages to the specified topic. Includes advanced comfort features for device name mapping and topic browsing.</p>
+    <p>Publishes messages to an MQTT broker. Uses the <b>mqtt-broker</b> config node for the full connection setup including TLS, protocol version (v3/v4/v5), keepalive, clean session, birth/will/close messages, and credentials.</p>
     <ul>
-        <li><b>Broker</b>: MQTT broker connection (required)</li>
-        <li><b>Topic</b>: Topic to publish to (required)</li>
+        <li><b>Broker</b>: MQTT broker config node (required)</li>
+        <li><b>Topic</b>: Topic to publish to (required, or pass via <code>msg.topic</code>)</li>
         <li><b>QoS</b>: Quality of Service (0, 1, 2)</li>
         <li><b>Retain</b>: Retain flag (true/false)</li>
-        <li><b>Comfort</b>: Enables device name mapping (Comfort Mode)</li>
-        <li><b>Recognition</b>: ID recognition type (exact, min/max, regex)</li>
-        <li><b>Info-Topic</b>: Suffix for info topics (default: /announce)</li>
+        <li><b>Comfort</b>: Enables device name mapping</li>
+        <li><b>Erkennung</b>: ID recognition type (exact length, min/max, regex)</li>
+        <li><b>Info-Topic</b>: Suffix for device-announce topics (default: /announce)</li>
         <li><b>JSON Keys</b>: Fields to extract device names (default: name,title,deviceName)</li>
     </ul>
-    <p><b>Inputs</b>:</p>
-    <ul>
-        <li><b>payload</b>: string | buffer – message payload to publish</li>
-        <li><b>topic</b>: string – MQTT topic (overrides configured topic)</li>
-        <li><b>qos</b>: number – Quality of Service (overrides configured QoS)</li>
-        <li><b>retain</b>: boolean – Retain flag (overrides configured retain)</li>
-        <li><b>responseTopic</b>: string – MQTTv5 response topic</li>
-        <li><b>correlationData</b>: Buffer – MQTTv5 correlation data</li>
-        <li><b>contentType</b>: string – MQTTv5 content type</li>
-        <li><b>userProperties</b>: object – MQTTv5 user properties</li>
-        <li><b>messageExpiryInterval</b>: number – MQTTv5 expiry time (seconds)</li>
-        <li><b>topicAlias</b>: number – MQTTv5 topic alias</li>
-    </ul>
-    <p><b>Comfort Mode</b>: Automatically maps cryptic device IDs to readable names using info topics and JSON keys. Use the <b>Listen</b> button to browse available topics and build the mapping.</p>
-    <p><b>Status</b>: Shows connection state and errors (e.g., connected, error, no broker).</p>
-    <p><b>Dynamic Control</b>: The node can be controlled by input messages (actions: connect, disconnect).</p>
-    <p>See the README for more details and examples.</p>
+    <p><b>Inputs</b>: <code>payload</code>, <code>topic</code>, <code>qos</code>, <code>retain</code>, and MQTTv5 properties (<code>responseTopic</code>, <code>correlationData</code>, <code>contentType</code>, <code>userProperties</code>, <code>messageExpiryInterval</code>, <code>topicAlias</code>).</p>
+    <p><b>Comfort Mode</b>: Use the <b>Listen</b> button to browse topics and build a device-name mapping. IDs in topic names are replaced with readable labels in the dropdown.</p>
 </script>
