@@ -1,0 +1,300 @@
+[
+    {
+        "id": "e7377d4a2cab8258",
+        "type": "tab",
+        "label": "Example MQTT Topic Selector",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f1f7ad9b690983b3",
+        "type": "group",
+        "z": "e7377d4a2cab8258",
+        "name": "Self hosted MQTT Broker via @stfi/node-red-contrib-mqtt-broker",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "7cbbfba9f89981d7",
+            "81215052bf51563e",
+            "3bfc9b86e0cb7619"
+        ],
+        "x": 34,
+        "y": 239,
+        "w": 592,
+        "h": 82
+    },
+    {
+        "id": "97ef32bc87348bca",
+        "type": "group",
+        "z": "e7377d4a2cab8258",
+        "name": "@stfi/node-red-contrib-mqtt-topic-selector",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "e120482054d001fc",
+            "5d7f84e068e25861",
+            "ebacaa9d0a3cddca",
+            "88bd0ed14ced7fb0",
+            "617ca58bcdf7e95f"
+        ],
+        "x": 34,
+        "y": 59,
+        "w": 592,
+        "h": 162
+    },
+    {
+        "id": "e120482054d001fc",
+        "type": "mqtt-topic-selector-in",
+        "z": "e7377d4a2cab8258",
+        "g": "97ef32bc87348bca",
+        "name": "Connect to mqtt.tdengine.com",
+        "topic": "weather",
+        "qos": "0",
+        "broker": "64e605cccf44c01c",
+        "comfortMode": "true",
+        "idPattern": "exact",
+        "idLengthExact": 32,
+        "idLengthMin": 10,
+        "idLengthMax": 40,
+        "idRegex": "^[a-zA-Z0-9\\-_]{32}$",
+        "nameSuffix": "/announce",
+        "nameKeys": "name,title,deviceName",
+        "fetchedTopics": "[\"analytical_instruments\",\"beverage/caploaders\",\"beverage/fillers\",\"beverage/labelers\",\"beverage/packagers\",\"beverage/sealers\",\"beverage/site/SITE_001/caploaders\",\"beverage/site/SITE_001/fillers\",\"beverage/site/SITE_001/labelers\",\"beverage/site/SITE_001/packagers\",\"beverage/site/SITE_001/sealers\",\"beverage/site/SITE_001/tanks\",\"beverage/site/SITE_001/vats\",\"beverage/site/SITE_001/washers\",\"beverage/site/SITE_001/workstations\",\"beverage/site/SITE_002/caploaders\",\"beverage/site/SITE_002/fillers\",\"beverage/site/SITE_002/labelers\",\"beverage/site/SITE_002/packagers\",\"beverage/site/SITE_002/sealers\",\"beverage/site/SITE_002/tanks\",\"beverage/site/SITE_002/vats\",\"beverage/site/SITE_002/washers\",\"beverage/site/SITE_002/workstations\",\"beverage/site/SITE_003/caploaders\",\"beverage/site/SITE_003/fillers\",\"beverage/site/SITE_003/labelers\",\"beverage/site/SITE_003/packagers\",\"beverage/site/SITE_003/sealers\",\"beverage/site/SITE_003/tanks\",\"beverage/site/SITE_003/vats\",\"beverage/site/SITE_003/washers\",\"beverage/site/SITE_003/workstations\",\"beverage/site/SITE_004/caploaders\",\"beverage/site/SITE_004/fillers\",\"beverage/site/SITE_004/labelers\",\"beverage/site/SITE_004/packagers\",\"beverage/site/SITE_004/sealers\",\"beverage/site/SITE_004/tanks\",\"beverage/site/SITE_004/vats\",\"beverage/site/SITE_004/washers\",\"beverage/site/SITE_004/workstations\",\"beverage/site/SITE_005/caploaders\",\"beverage/site/SITE_005/fillers\",\"beverage/site/SITE_005/labelers\",\"beverage/site/SITE_005/packagers\",\"beverage/site/SITE_005/sealers\",\"beverage/site/SITE_005/tanks\",\"beverage/site/SITE_005/vats\",\"beverage/site/SITE_005/washers\",\"beverage/site/SITE_005/workstations\",\"beverage/tanks\",\"beverage/vats\",\"beverage/washers\",\"beverage/workstations\",\"california/site/SITE_001\",\"california/site/SITE_001/grid/GRID_001\",\"california/site/SITE_001/inverter/INV_001_001\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR001\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR002\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR003\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR004\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR005\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR006\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR007\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR008\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR009\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR010\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR011\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR012\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR013\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR014\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR015\",\"california/site/SITE_001/inverter/INV_001_001/string/INV_001_001_STR016\",\"california/site/SITE_001/inverter/INV_001_002\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR001\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR002\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR003\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR004\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR005\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR006\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR007\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR008\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR009\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR010\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR011\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR012\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR013\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR014\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR015\",\"california/site/SITE_001/inverter/INV_001_002/string/INV_001_002_STR016\",\"california/site/SITE_001/inverter/INV_001_003\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR001\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR002\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR003\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR004\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR005\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR006\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR007\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR008\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR009\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR010\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR011\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR012\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR013\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR014\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR015\",\"california/site/SITE_001/inverter/INV_001_003/string/INV_001_003_STR016\",\"california/site/SITE_001/inverter/INV_001_004\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR001\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR002\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR003\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR004\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR005\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR006\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR007\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR008\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR009\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR010\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR011\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR012\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR013\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR014\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR015\",\"california/site/SITE_001/inverter/INV_001_004/string/INV_001_004_STR016\",\"california/site/SITE_001/weather/WS_001\",\"california/site/SITE_002\",\"california/site/SITE_002/grid/GRID_002\",\"california/site/SITE_002/inverter/INV_002_001\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR001\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR002\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR003\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR004\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR005\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR006\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR007\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR008\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR009\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR010\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR011\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR012\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR013\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR014\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR015\",\"california/site/SITE_002/inverter/INV_002_001/string/INV_002_001_STR016\",\"california/site/SITE_002/inverter/INV_002_002\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR001\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR002\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR003\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR004\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR005\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR006\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR007\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR008\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR009\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR010\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR011\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR012\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR013\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR014\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR015\",\"california/site/SITE_002/inverter/INV_002_002/string/INV_002_002_STR016\",\"california/site/SITE_002/inverter/INV_002_003\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR001\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR002\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR003\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR004\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR005\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR006\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR007\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR008\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR009\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR010\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR011\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR012\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR013\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR014\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR015\",\"california/site/SITE_002/inverter/INV_002_003/string/INV_002_003_STR016\",\"california/site/SITE_002/inverter/INV_002_004\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR001\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR002\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR003\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR004\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR005\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR006\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR007\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR008\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR009\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR010\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR011\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR012\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR013\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR014\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR015\",\"california/site/SITE_002/inverter/INV_002_004/string/INV_002_004_STR016\",\"california/site/SITE_002/inverter/INV_002_005\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR001\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR002\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR003\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR004\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR005\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR006\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR007\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR008\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR009\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR010\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR011\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR012\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR013\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR014\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR015\",\"california/site/SITE_002/inverter/INV_002_005/string/INV_002_005_STR016\",\"california/site/SITE_002/inverter/INV_002_006\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR001\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR002\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR003\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR004\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR005\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR006\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR007\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR008\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR009\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR010\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR011\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR012\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR013\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR014\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR015\",\"california/site/SITE_002/inverter/INV_002_006/string/INV_002_006_STR016\",\"california/site/SITE_002/inverter/INV_002_007\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR001\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR002\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR003\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR004\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR005\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR006\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR007\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR008\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR009\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR010\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR011\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR012\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR013\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR014\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR015\",\"california/site/SITE_002/inverter/INV_002_007/string/INV_002_007_STR016\",\"california/site/SITE_002/inverter/INV_002_008\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR001\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR002\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR003\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR004\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR005\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR006\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR007\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR008\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR009\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR010\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR011\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR012\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR013\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR014\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR015\",\"california/site/SITE_002/inverter/INV_002_008/string/INV_002_008_STR016\",\"california/site/SITE_002/inverter/INV_002_009\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR001\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR002\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR003\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR004\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR005\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR006\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR007\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR008\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR009\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR010\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR011\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR012\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR013\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR014\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR015\",\"california/site/SITE_002/inverter/INV_002_009/string/INV_002_009_STR016\",\"california/site/SITE_002/inverter/INV_002_010\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR001\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR002\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR003\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR004\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR005\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR006\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR007\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR008\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR009\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR010\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR011\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR012\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR013\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR014\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR015\",\"california/site/SITE_002/inverter/INV_002_010/string/INV_002_010_STR016\",\"california/site/SITE_002/weather/WS_002\",\"california/site/SITE_003\",\"california/site/SITE_003/inverter/INV_003_001\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR001\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR002\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR003\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR004\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR005\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR006\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR007\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR008\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR009\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR010\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR011\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR012\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR013\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR014\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR015\",\"california/site/SITE_003/inverter/INV_003_001/string/INV_003_001_STR016\",\"california/site/SITE_003/inverter/INV_003_002\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR001\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR002\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR003\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR004\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR005\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR006\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR007\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR008\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR009\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR010\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR011\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR012\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR013\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR014\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR015\",\"california/site/SITE_003/inverter/INV_003_002/string/INV_003_002_STR016\",\"california/site/SITE_003/inverter/INV_003_003\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR001\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR002\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR003\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR004\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR005\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR006\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR007\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR008\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR009\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR010\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR011\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR012\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR013\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR014\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR015\",\"california/site/SITE_003/inverter/INV_003_003/string/INV_003_003_STR016\",\"california/site/SITE_003/inverter/INV_003_004\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR001\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR002\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR003\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR004\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR005\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR006\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR007\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR008\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR009\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR010\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR011\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR012\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR013\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR014\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR015\",\"california/site/SITE_003/inverter/INV_003_004/string/INV_003_004_STR016\",\"california/site/SITE_003/inverter/INV_003_005\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR001\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR002\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR003\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR004\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR005\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR006\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR007\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR008\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR009\",\"california/site/SITE_003/inverter/INV_003_005/string/INV_003_005_STR010\",\"compressors\",\"datacenter/cooling_faults\",\"datacenter/cooling_plants\",\"datacenter/fabric\",\"datacenter/jobs\",\"datacenter/nodes\",\"datacenter/rack_cooling\",\"datacenter/site/COOL_SITE_001/cooling_faults\",\"datacenter/site/COOL_SITE_001/cooling_plants\",\"datacenter/site/COOL_SITE_001/nodes\",\"datacenter/site/COOL_SITE_001/rack_cooling\",\"datacenter/site/COOL_SITE_002/cooling_faults\",\"datacenter/site/COOL_SITE_002/cooling_plants\",\"datacenter/site/COOL_SITE_002/nodes\",\"datacenter/site/COOL_SITE_002/rack_cooling\",\"datacenter/site/DC_SITE_001/fabric\",\"datacenter/site/DC_SITE_001/jobs\",\"datacenter/site/DC_SITE_001/nodes\",\"datacenter/site/DC_SITE_002/fabric\",\"datacenter/site/DC_SITE_002/jobs\",\"datacenter/site/DC_SITE_002/nodes\",\"datacenter/site/DC_SITE_003/fabric\",\"datacenter/site/DC_SITE_003/jobs\",\"datacenter/site/DC_SITE_003/nodes\",\"distillation_columns\",\"feedwater\",\"furnace\",\"grid\",\"heat_exchangers\",\"hsm/downcoiler/stream/snapshot\",\"hsm/finishing_mill/stream/snapshot\",\"hsm/furnace/stream/snapshot\",\"hsm/line/stream/snapshot\",\"inverters\",\"pharma/environment\",\"pharma/hvac\",\"pharma/line_correlation\",\"pharma/production/line_runtime_throughput\",\"pharma/production/operational_efficiency\",\"plants\",\"powerplant/condenser\",\"powerplant/condenser_performance\",\"powerplant/cooling_water\",\"powerplant/plant\",\"powerplant/unit\",\"process_units\",\"pumps\",\"pv/automation\",\"pv/cells\",\"pv/devices\",\"pv/modules\",\"pwaero/machines\",\"pwaero/thermal_health\",\"reactors\",\"refineries\",\"refinery/blends\",\"refinery/financials\",\"refinery/tags\",\"refinery/units\",\"renewables/csp\",\"renewables/fleet\",\"renewables/pv\",\"renewables_pi/csp\",\"renewables_pi/fleet\",\"renewables_pi/pv\",\"safety\",\"sites\",\"spBv1.0/STATE/IamHost\",\"steam_drum\",\"strings\",\"tobacco/devices\",\"tobacco/environment\",\"tobacco/making\",\"tobacco/process\",\"wastewater/biological\",\"wastewater/effluent\",\"wastewater/influent\",\"wastewater/primary\",\"wastewater/secondary\",\"wastewater/sludge\",\"weather\",\"wells\"]",
+        "fetchedLookup": "{}",
+        "x": 180,
+        "y": 100,
+        "wires": [
+            [
+                "ebacaa9d0a3cddca"
+            ]
+        ]
+    },
+    {
+        "id": "5d7f84e068e25861",
+        "type": "debug",
+        "z": "e7377d4a2cab8258",
+        "g": "97ef32bc87348bca",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": false,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload.Ambient_Temperature_C",
+        "targetType": "msg",
+        "statusVal": "payload.Ambient_Temperature_C",
+        "statusType": "auto",
+        "x": 520,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "ebacaa9d0a3cddca",
+        "type": "json",
+        "z": "e7377d4a2cab8258",
+        "g": "97ef32bc87348bca",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 370,
+        "y": 100,
+        "wires": [
+            [
+                "5d7f84e068e25861"
+            ]
+        ]
+    },
+    {
+        "id": "7cbbfba9f89981d7",
+        "type": "mqttbroker",
+        "z": "e7377d4a2cab8258",
+        "g": "f1f7ad9b690983b3",
+        "name": "",
+        "port": 1883,
+        "bind": "",
+        "allowAnonymous": true,
+        "persistence": true,
+        "persistenceLocation": "C:\\Allgemeiner_Ordner\\node-red\\NODES_DEVELOPMENT\\node-red-mqtt-nodes\\mqtt-broker-persistence\\47de6a3b95831e4c\\",
+        "binaryPath": "C:\\Program Files\\mosquitto\\mosquitto.exe",
+        "configPath": "",
+        "installScope": "auto",
+        "updateCheckEnabled": true,
+        "updateCheckInterval": 15,
+        "logToConsole": false,
+        "logToTerminal": true,
+        "x": 130,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "81215052bf51563e",
+        "type": "mqtt out",
+        "z": "e7377d4a2cab8258",
+        "g": "f1f7ad9b690983b3",
+        "name": "",
+        "topic": "foo/bar",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "87908400f2214649",
+        "x": 540,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "3bfc9b86e0cb7619",
+        "type": "inject",
+        "z": "e7377d4a2cab8258",
+        "g": "f1f7ad9b690983b3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "$floor($random() * 100)",
+        "payloadType": "jsonata",
+        "x": 390,
+        "y": 280,
+        "wires": [
+            [
+                "81215052bf51563e"
+            ]
+        ]
+    },
+    {
+        "id": "88bd0ed14ced7fb0",
+        "type": "mqtt-topic-selector-in",
+        "z": "e7377d4a2cab8258",
+        "g": "97ef32bc87348bca",
+        "name": "Connect to self hosted MQTT Broker",
+        "topic": "foo/bar",
+        "qos": "0",
+        "broker": "87908400f2214649",
+        "comfortMode": "true",
+        "idPattern": "exact",
+        "idLengthExact": 32,
+        "idLengthMin": 10,
+        "idLengthMax": 40,
+        "idRegex": "^[a-zA-Z0-9\\-_]{32}$",
+        "nameSuffix": "/announce",
+        "nameKeys": "name,title,deviceName",
+        "fetchedTopics": "[\"foo/bar\"]",
+        "fetchedLookup": "{}",
+        "x": 200,
+        "y": 180,
+        "wires": [
+            [
+                "617ca58bcdf7e95f"
+            ]
+        ]
+    },
+    {
+        "id": "617ca58bcdf7e95f",
+        "type": "debug",
+        "z": "e7377d4a2cab8258",
+        "g": "97ef32bc87348bca",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": false,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload.Ambient_Temperature_C",
+        "statusType": "auto",
+        "x": 520,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "64e605cccf44c01c",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "mqtt.tdengine.com",
+        "port": "8883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "87908400f2214649",
+        "type": "mqtt-broker",
+        "name": "localhost",
+        "broker": "localhost",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "e1c47afb6e2a299a",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@stfi/node-red-contrib-mqtt-topic-selector": "1.0.0",
+            "@stfi/node-red-contrib-mqtt-broker": "0.5.0"
+        }
+    }
+]
