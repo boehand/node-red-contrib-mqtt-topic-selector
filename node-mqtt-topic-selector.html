@@ -4,17 +4,20 @@
         var raw = this.topic;
         if (!raw) return this.type === 'mqtt-topic-selector-in' ? "mqtt-topic-selector-in" : "mqtt-topic-selector-out";
 
+        var topicName = raw;
         var isComfort = (this.comfortMode === "true" || this.comfortMode === true);
         if (isComfort && this.fetchedLookup) {
             var lookup = {};
             try { lookup = JSON.parse(this.fetchedLookup); } catch(e) {}
-            var lbl = raw;
             Object.keys(lookup).forEach(function(id) {
-                if (lbl.includes(id)) lbl = lbl.split(id).join(lookup[id]);
+                if (topicName.includes(id)) topicName = topicName.split(id).join(lookup[id]);
             });
-            return lbl;
         }
-        return raw;
+
+        var brokerNode = RED.nodes.node(this.broker);
+        var brokerName = brokerNode ? (brokerNode.name || brokerNode.broker) : "unknown broker";
+
+        return "Subscribe topic " +topicName+ " from " + brokerName;
     }
 
     function setupTopicBrowser(buttonId, brokerInputId, realTopicId, visualTopicId, comfortId, topicsStorageId, lookupStorageId, labelTopicId, configDivId, toggleBtnId) {
@@ -120,12 +123,12 @@
         $(buttonId).click(function() {
             var brokerId = $(brokerInputId).val();
             if (!brokerId || brokerId === "_ADD_") {
-                RED.notify("Bitte Broker wählen und deployen.", "warning");
+                RED.notify("Please select and deploy a broker.", "warning");
                 return;
             }
             var btn = $(this);
             var originalText = btn.html();
-            btn.html('<i class="fa fa-spinner fa-spin"></i> Listen...');
+            btn.html('<i class="fa fa-spinner fa-spin"></i> Listening...');
             btn.prop('disabled', true);
 
             var reqData = {
@@ -147,7 +150,7 @@
                     btn.html(originalText);
                     btn.prop('disabled', false);
                     if (!data.connected) {
-                        var msg = data.error ? "Verbindung fehlgeschlagen: " + data.error : "Verbindung zum Broker fehlgeschlagen (TLS, Port oder Zugangsdaten prüfen).";
+                        var msg = data.error ? "Connection failed: " + data.error : "Connection to broker failed (check TLS, port, or credentials).";
                         RED.notify(msg, "error");
                         return;
                     }
@@ -158,15 +161,15 @@
                         $(lookupStorageId).val(JSON.stringify(savedLookup));
                         applyComfortMode();
                         $(visualTopicId).autocomplete("search", "");
-                        RED.notify(data.topics.length + " Topics empfangen.", "success");
+                        RED.notify(data.topics.length + " topics received.", "success");
                     } else {
-                        RED.notify("Verbunden, aber keine Topics empfangen (keine retained Messages und kein Live-Traffic in 5 s).", "info");
+                        RED.notify("Connected, but no topics received (no retained messages and no live traffic in 5s).", "info");
                     }
                 },
                 error: function() {
                     btn.html(originalText);
                     btn.prop('disabled', false);
-                    RED.notify("Fehler beim Browsen.", "error");
+                    RED.notify("Error while browsing.", "error");
                 }
             });
         });
@@ -274,19 +277,19 @@
 
     <div class="form-row">
         <label for="node-input-comfortMode">
-            <i class="fa fa-magic"></i> Komfort
-            <i class="fa fa-info-circle" title="Baut im Hintergrund ein Wörterbuch aus Info-Topics auf. Kryptische IDs werden in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
+            <i class="fa fa-magic"></i> Comfort
+            <i class="fa fa-info-circle" title="Builds a dictionary from info-topics in the background. Cryptic IDs in the dropdown list are automatically replaced by readable names."></i>
         </label>
         <select id="node-input-comfortMode" style="width:125px">
-            <option value="false">Aus</option>
-            <option value="true">An</option>
+            <option value="false">Off</option>
+            <option value="true">On</option>
         </select>
     </div>
 
     <div class="form-row" style="margin-bottom: 5px;">
         <label></label>
         <a href="#" id="advanced-toggle-in" style="text-decoration: none; color: #555; font-size: 0.9em;">
-            <i class="fa fa-caret-down"></i> Erweiterte Komfort-Einstellungen
+            <i class="fa fa-caret-down"></i> Advanced Comfort Settings
         </a>
     </div>
 
@@ -294,28 +297,28 @@
 
         <div class="form-row">
             <label for="node-input-idPattern" style="width: 120px;">
-                <i class="fa fa-cogs"></i> Erkennung
-                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie durch lesbare Namen ersetzen zu können."></i>
+                <i class="fa fa-cogs"></i> Recognition
+                <i class="fa fa-info-circle" title="Defines the pattern of cryptic IDs. The node searches topics for these IDs to replace them with readable names."></i>
             </label>
             <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
-                <option value="exact">Exakte Länge</option>
-                <option value="minmax">Min/Max Länge</option>
-                <option value="custom">Regex (Profi)</option>
+                <option value="exact">Exact Length</option>
+                <option value="minmax">Min/Max Length</option>
+                <option value="custom">Regex (Advanced)</option>
             </select>
         </div>
 
         <div class="form-row exact-row" style="display: none;">
             <label style="width: 120px;">
-                <i class="fa fa-arrows-h"></i> Zeichen
-                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen)."></i>
+                <i class="fa fa-arrows-h"></i> Characters
+                <i class="fa fa-info-circle" title="The exact character length of the searched IDs (e.g., 32 characters)."></i>
             </label>
             <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
         </div>
 
         <div class="form-row minmax-row" style="display: none;">
             <label style="width: 120px;">
-                <i class="fa fa-arrows-h"></i> Länge
-                <i class="fa fa-info-circle" title="Die minimale und maximale Zeichenlänge der gesuchten IDs."></i>
+                <i class="fa fa-arrows-h"></i> Length
+                <i class="fa fa-info-circle" title="The minimum and maximum character length of the searched IDs."></i>
             </label>
             Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
             Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
@@ -324,15 +327,15 @@
         <div class="form-row custom-regex-row" style="display: none;">
             <label for="node-input-idRegex" style="width: 120px;">
                 <i class="fa fa-code"></i> Regex
-                <i class="fa fa-info-circle" title="Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen."></i>
+                <i class="fa fa-info-circle" title="A regular expression to detect complex IDs in topics."></i>
             </label>
             <input type="text" id="node-input-idRegex" class="custom-regex-input" style="width: 250px;">
         </div>
 
         <div class="form-row">
             <label for="node-input-nameSuffix" style="width: 120px;">
-                <i class="fa fa-filter"></i> Info-Topic
-                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um IDs zu Gerätenamen zuzuordnen."></i>
+                <i class="fa fa-filter"></i> Info Topic
+                <i class="fa fa-info-circle" title="The node collects these special topics (e.g., '/announce') from the broker to map IDs to device names."></i>
             </label>
             <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
         </div>
@@ -340,7 +343,7 @@
         <div class="form-row" style="margin-bottom: 5px;">
             <label for="node-input-nameKeys" style="width: 120px;">
                 <i class="fa fa-key"></i> JSON Keys
-                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Mehrere Felder mit Komma trennen."></i>
+                <i class="fa fa-info-circle" title="Specifies which field in the info-topic contains the readable name (e.g., 'name' or 'deviceName'). Separate multiple fields with a comma."></i>
             </label>
             <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
         </div>
@@ -352,7 +355,7 @@
         </label>
         <div style="display: flex; align-items: center; flex-grow: 1;">
             <div style="position: relative; flex-grow: 1;">
-                <input type="text" id="node-input-topicVisual" style="width: 100%; padding-right: 24px;" placeholder="Topic auswählen oder eingeben">
+                <input type="text" id="node-input-topicVisual" style="width: 100%; padding-right: 24px;" placeholder="Select or enter topic">
                 <i class="fa fa-caret-down" style="position: absolute; right: 8px; top: 10px; color: #777; pointer-events: none;"></i>
             </div>
             <a id="node-browse-button-in" class="red-ui-button" style="margin-left: 10px; white-space: nowrap;"><i class="fa fa-search"></i> Listen</a>
@@ -381,7 +384,7 @@
         <li><b>Topic</b>: Topic to subscribe to (supports wildcards, required)</li>
         <li><b>QoS</b>: Quality of Service (0, 1, 2)</li>
         <li><b>Comfort</b>: Enables device name mapping</li>
-        <li><b>Erkennung</b>: ID recognition type (exact length, min/max, regex)</li>
+        <li><b>ID-Detection for Comfort-Mode</b>: ID recognition type (exact length, min/max, regex)</li>
         <li><b>Info-Topic</b>: Suffix for device-announce topics (default: /announce)</li>
         <li><b>JSON Keys</b>: Fields to extract device names (default: name,title,deviceName)</li>
     </ul>
@@ -402,19 +405,19 @@
 
     <div class="form-row">
         <label for="node-input-comfortModeOut">
-            <i class="fa fa-magic"></i> Komfort
-            <i class="fa fa-info-circle" title="Baut im Hintergrund ein Wörterbuch aus Info-Topics auf. Kryptische IDs werden in der Dropdown-Liste automatisch durch verständliche Namen ersetzt."></i>
+            <i class="fa fa-magic"></i> Comfort
+            <i class="fa fa-info-circle" title="Builds a dictionary from info-topics in the background. Cryptic IDs in the dropdown list are automatically replaced by readable names."></i>
         </label>
         <select id="node-input-comfortModeOut" style="width:125px">
-            <option value="false">Aus</option>
-            <option value="true">An</option>
+            <option value="false">Off</option>
+            <option value="true">On</option>
         </select>
     </div>
 
     <div class="form-row" style="margin-bottom: 5px;">
         <label></label>
         <a href="#" id="advanced-toggle-out" style="text-decoration: none; color: #555; font-size: 0.9em;">
-            <i class="fa fa-caret-down"></i> Erweiterte Komfort-Einstellungen
+            <i class="fa fa-caret-down"></i> Advanced Comfort Settings
         </a>
     </div>
 
@@ -422,28 +425,28 @@
 
         <div class="form-row">
             <label for="node-input-idPattern" style="width: 120px;">
-                <i class="fa fa-cogs"></i> Erkennung
-                <i class="fa fa-info-circle" title="Legt fest, wie die kryptischen IDs aussehen. Der Node durchsucht die Topics nach diesen IDs, um sie durch lesbare Namen ersetzen zu können."></i>
+                <i class="fa fa-cogs"></i> Recognition
+                <i class="fa fa-info-circle" title="Defines the pattern of cryptic IDs. The node searches topics for these IDs to replace them with readable names."></i>
             </label>
             <select id="node-input-idPattern" class="pattern-select" style="width: 250px;">
-                <option value="exact">Exakte Länge</option>
-                <option value="minmax">Min/Max Länge</option>
-                <option value="custom">Regex (Profi)</option>
+                <option value="exact">Exact Length</option>
+                <option value="minmax">Min/Max Length</option>
+                <option value="custom">Regex (Advanced)</option>
             </select>
         </div>
 
         <div class="form-row exact-row" style="display: none;">
             <label style="width: 120px;">
-                <i class="fa fa-arrows-h"></i> Zeichen
-                <i class="fa fa-info-circle" title="Die exakte Zeichenlänge der gesuchten IDs (z.B. 32 Zeichen)."></i>
+                <i class="fa fa-arrows-h"></i> Characters
+                <i class="fa fa-info-circle" title="The exact character length of the searched IDs (e.g., 32 characters)."></i>
             </label>
             <input type="number" id="node-input-idLengthExact" class="id-length-exact" style="width: 60px; text-align: center;">
         </div>
 
         <div class="form-row minmax-row" style="display: none;">
             <label style="width: 120px;">
-                <i class="fa fa-arrows-h"></i> Länge
-                <i class="fa fa-info-circle" title="Die minimale und maximale Zeichenlänge der gesuchten IDs."></i>
+                <i class="fa fa-arrows-h"></i> Length
+                <i class="fa fa-info-circle" title="The minimum and maximum character length of the searched IDs."></i>
             </label>
             Min: <input type="number" id="node-input-idLengthMin" class="id-length-min" style="width: 60px; text-align: center; margin-right: 10px;">
             Max: <input type="number" id="node-input-idLengthMax" class="id-length-max" style="width: 60px; text-align: center;">
@@ -452,15 +455,15 @@
         <div class="form-row custom-regex-row" style="display: none;">
             <label for="node-input-idRegex" style="width: 120px;">
                 <i class="fa fa-code"></i> Regex
-                <i class="fa fa-info-circle" title="Ein regulärer Ausdruck, um komplexe IDs in den Topics zu erkennen."></i>
+                <i class="fa fa-info-circle" title="A regular expression to detect complex IDs in topics."></i>
             </label>
             <input type="text" id="node-input-idRegex" class="custom-regex-input" style="width: 250px;">
         </div>
 
         <div class="form-row">
             <label for="node-input-nameSuffix" style="width: 120px;">
-                <i class="fa fa-filter"></i> Info-Topic
-                <i class="fa fa-info-circle" title="Der Node sammelt diese speziellen Topics (z.B. '/announce') vom Broker, um IDs zu Gerätenamen zuzuordnen."></i>
+                <i class="fa fa-filter"></i> Info Topic
+                <i class="fa fa-info-circle" title="The node collects these special topics (e.g., '/announce') from the broker to map IDs to device names."></i>
             </label>
             <input type="text" id="node-input-nameSuffix" class="name-suffix-input" style="width: 250px;" placeholder="/announce">
         </div>
@@ -468,7 +471,7 @@
         <div class="form-row" style="margin-bottom: 5px;">
             <label for="node-input-nameKeys" style="width: 120px;">
                 <i class="fa fa-key"></i> JSON Keys
-                <i class="fa fa-info-circle" title="Legt fest, in welchem Feld des Info-Topics der Klarname steht (z.B. 'name' oder 'deviceName'). Mehrere Felder mit Komma trennen."></i>
+                <i class="fa fa-info-circle" title="Specifies which field in the info-topic contains the readable name (e.g., 'name' or 'deviceName'). Separate multiple fields with a comma."></i>
             </label>
             <input type="text" id="node-input-nameKeys" class="name-keys-input" style="width: 250px;" placeholder="name,title,deviceName">
         </div>
@@ -480,7 +483,7 @@
         </label>
         <div style="display: flex; align-items: center; flex-grow: 1;">
             <div style="position: relative; flex-grow: 1;">
-                <input type="text" id="node-input-topicVisual" style="width: 100%; padding-right: 24px;" placeholder="Topic auswählen (optional)">
+                <input type="text" id="node-input-topicVisual" style="width: 100%; padding-right: 24px;" placeholder="Select topic (optional)">
                 <i class="fa fa-caret-down" style="position: absolute; right: 8px; top: 10px; color: #777; pointer-events: none;"></i>
             </div>
             <a id="node-browse-button-out" class="red-ui-button" style="margin-left: 10px; white-space: nowrap;"><i class="fa fa-search"></i> Listen</a>
@@ -517,7 +520,7 @@
         <li><b>QoS</b>: Quality of Service (0, 1, 2)</li>
         <li><b>Retain</b>: Retain flag (true/false)</li>
         <li><b>Comfort</b>: Enables device name mapping</li>
-        <li><b>Erkennung</b>: ID recognition type (exact length, min/max, regex)</li>
+        <li><b>ID-Detection for Comfort-Mode</b>: ID recognition type (exact length, min/max, regex)</li>
         <li><b>Info-Topic</b>: Suffix for device-announce topics (default: /announce)</li>
         <li><b>JSON Keys</b>: Fields to extract device names (default: name,title,deviceName)</li>
     </ul>
