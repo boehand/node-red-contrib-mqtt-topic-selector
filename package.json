@@ -1,6 +1,6 @@
 {
   "name": "@stfi/node-red-contrib-mqtt-topic-selector",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Node-RED node for selecting topics from an MQTT broker via live-listening.",
   "author": "boehand",
   "organization": "STFI, Chemnitz (Germany)",
