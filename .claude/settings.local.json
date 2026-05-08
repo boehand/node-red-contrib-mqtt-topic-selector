@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(curl -s \"https://raw.githubusercontent.com/node-red/node-red/master/packages/node_modules/%40node-red/nodes/core/network/10-mqtt.html\")",
-      "Bash(curl -s \"https://raw.githubusercontent.com/node-red/node-red/master/packages/node_modules/%40node-red/nodes/core/network/10-mqtt.js\")"
-    ]
-  }
-}
